@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.repository.config import Base
-from .assignment import Assignment
+from app.models.assignment import Assignment
 
 
 class User(Base):
