@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 @unique
-class Priority(str, Enum):
+class TaskPriority(str, Enum):
     LOW = 1
     BELOW_NORMAL = 2
     NORMAL = 3
@@ -12,7 +12,7 @@ class Priority(str, Enum):
 
 
 @unique
-class Status(str, Enum):
+class TaskStatus(str, Enum):
     NEW = 1
     IN_PROGRESS = 2
     RESOLVED = 3
@@ -24,8 +24,8 @@ class TaskBase(BaseModel):
 
 class TaskCreate(TaskBase):
     description: str
-    priority: Optional[int] = Priority.NORMAL
-    status: Optional[int] = Status.NEW
+    priority: Optional[int] = TaskPriority.NORMAL
+    status: Optional[int] = TaskStatus.NEW
 
 
 class Task(TaskBase):

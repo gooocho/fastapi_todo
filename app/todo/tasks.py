@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import crud_task
 from app.repository.config import repository_session
-from app.schemas.task import Task, TaskCreate
+from app.schemas.task import Task, TaskCreate, TaskStatus
 
 
 tasks = APIRouter(prefix="/tasks")
@@ -21,7 +21,7 @@ async def read_tasks(
     """
     タスクをすべて取得する
     """
-    return crud_task.get_tasks(db, skip=skip, limit=limit)
+    return crud_task.all(db, skip=skip, limit=limit)
 
 
 @tasks.post("/", response_model=Task, tags=["tasks"])
@@ -29,4 +29,17 @@ async def create_task(task: TaskCreate, db: Session = Depends(repository_session
     """
     タスクを登録する
     """
-    return crud_task.create_task(db=db, task=task)
+    return crud_task.create(db=db, task=task)
+
+
+@tasks.get("/unresolved", response_model=List[Task], tags=["tasks"])
+async def unresolved_tasks(
+    skip: int = 0, limit: int = 100, db: Session = Depends(repository_session)
+):
+    """
+    未完了のタスク(NEW / IN_PROGRESS)を取得する
+    ステータス(IN_PROGRESS -> NEW)、優先度(高->低)の順で出力される
+    """
+    return crud_task.filterd_by_status(
+        db=db, statues=[TaskStatus.NEW, TaskStatus.IN_PROGRESS], skip=skip, limit=limit
+    )
