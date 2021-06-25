@@ -8,8 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import crud_task
 from app.repository.config import repository_session
-from app.schemas.task import Task
-from app.schemas.task import TaskCreate
+from app.schemas.task import Task, TaskCreate
 
 
 tasks = APIRouter(prefix="/tasks")

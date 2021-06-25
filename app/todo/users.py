@@ -8,8 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import crud_user
 from app.repository.config import repository_session
-from app.schemas.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import User, UserCreate
 
 
 users = APIRouter(prefix="/users")
