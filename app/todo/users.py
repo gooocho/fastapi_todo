@@ -22,7 +22,7 @@ async def read_users(
     """
     ユーザーをすべて取得する
     """
-    users = crud_user.get_users(db, skip=skip, limit=limit)
+    users = crud_user.all(db, skip=skip, limit=limit)
     return users
 
 
@@ -31,10 +31,10 @@ async def create_user(user: UserCreate, db: Session = Depends(repository_session
     """
     ユーザーを登録する
     """
-    db_user = crud_user.get_user_by_mail(db, mail=user.mail)
+    db_user = crud_user.find_by_mail(db, mail=user.mail)
     if db_user:
         raise HTTPException(status_code=400, detail="mail already registered")
-    return crud_user.create_user(db=db, user=user)
+    return crud_user.create(db=db, user=user)
 
 
 @users.get("/{user_id}", response_model=User, tags=["users"])
@@ -42,7 +42,7 @@ async def read_user(user_id: int, db=Depends(repository_session)):
     """
     ユーザーIDを指定してユーザーを1つ取得する
     """
-    db_user = crud_user.get_user(db, user_id=user_id)
+    db_user = crud_user.find(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
@@ -53,10 +53,10 @@ async def delete_user(user_id: int, db=Depends(repository_session)):
     """
     ユーザーを削除する
     """
-    db_user = crud_user.get_user(db, user_id=user_id)
+    db_user = crud_user.find(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return crud_user.delete_user(db=db, user_id=user_id)
+    return crud_user.delete(db=db, user_id=user_id)
 
 
 @users.get("/{user_id}/not_resolved", response_model=List[Task], tags=["users"])
