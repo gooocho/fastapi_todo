@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import crud_task
 from app.repository.config import repository_session
-from app.schemas.task import Task, TaskCreate, TaskStatus
+from app.schemas.task import Task, TaskCreate, NOT_RESOLVED
 
 
 tasks = APIRouter(prefix="/tasks")
@@ -38,8 +38,19 @@ async def unresolved_tasks(
 ):
     """
     未完了のタスク(NEW / IN_PROGRESS)を取得する
-    ステータス(IN_PROGRESS -> NEW)、優先度(高->低)の順で出力される
+    ステータス(IN_PROGRESS -> NEW), 優先度(高->低), ID(低->高)の順で出力される
     """
     return crud_task.filterd_by_status(
-        db=db, statues=[TaskStatus.NEW, TaskStatus.IN_PROGRESS], skip=skip, limit=limit
+        db=db, statues=NOT_RESOLVED, skip=skip, limit=limit
     )
+
+
+@tasks.get("/not_assigned", response_model=List[Task], tags=["tasks"])
+async def not_assigned_tasks(
+    skip: int = 0, limit: int = 100, db: Session = Depends(repository_session)
+):
+    """
+    誰にもアサインされていない未完了のタスクを取得する
+    優先度(高->低), ID(低->高)の順で出力される
+    """
+    return crud_task.not_assigned(db=db, statues=NOT_RESOLVED, skip=skip, limit=limit)

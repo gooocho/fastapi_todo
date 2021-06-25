@@ -2,6 +2,7 @@ from enum import Enum, unique
 from pydantic import BaseModel
 from typing import Optional
 
+
 @unique
 class TaskPriority(str, Enum):
     LOW = 1
@@ -16,6 +17,9 @@ class TaskStatus(str, Enum):
     NEW = 1
     IN_PROGRESS = 2
     RESOLVED = 3
+
+
+NOT_RESOLVED = [TaskStatus.NEW, TaskStatus.IN_PROGRESS]
 
 
 class TaskBase(BaseModel):
