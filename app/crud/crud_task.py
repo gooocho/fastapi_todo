@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 
 from app.models.task import Task
-from app.schemas.task import TaskCreateReq
+from app.schemas.task import TaskCreate
 
 
 def get_tasks(db: Session, skip: int, limit: int):
     return db.query(Task).offset(skip).limit(limit).all()
 
 
-def create_task(db: Session, task: TaskCreateReq):
+def create_task(db: Session, task: TaskCreate):
     db_task = Task(
         title=task.title,
         description=task.description,
