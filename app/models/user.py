@@ -15,5 +15,6 @@ class User(Base):
     tasks = relationship(
         "Task",
         secondary=Assignment.__tablename__,
+        order_by="Task.id",
         back_populates="users",
     )
