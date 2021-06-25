@@ -14,13 +14,13 @@ assignments = APIRouter(prefix="/assignments")
 
 
 @assignments.post("/assign", response_model=UserTaskPair, tags=["assignments"])
-async def assign_task(
+async def assign(
     user_id: int, task_id: int, db: Session = Depends(repository_session)
 ):
     """
     ユーザーとタスクを紐づける
     """
-    db_user, db_task = crud_assignment.assign_task(
+    db_user, db_task = crud_assignment.assign(
         db=db, user_id=user_id, task_id=task_id
     )
     return UserTaskPair(user=db_user, task=db_task)
