@@ -2,6 +2,7 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.models.assignment import Assignment
+from app.models.user import User
 from app.models.task import Task
 from app.schemas.task import TaskCreate
 
@@ -23,10 +24,10 @@ def create(db: Session, task: TaskCreate):
     return db_task
 
 
-def filterd_by_status(db: Session, statues: list[int], skip: int, limit: int):
+def filterd_by_status(db: Session, statuses: list[int], skip: int, limit: int):
     return (
         db.query(Task)
-        .filter(Task.status.in_(statues))
+        .filter(Task.status.in_(statuses))
         .order_by(desc(Task.status), desc(Task.priority), Task.id)
         .offset(skip)
         .limit(limit)
@@ -34,13 +35,28 @@ def filterd_by_status(db: Session, statues: list[int], skip: int, limit: int):
     )
 
 
-def not_assigned(db: Session, statues: list[int], skip: int, limit: int):
-    subquery = ~db.query(Assignment.task_id).filter(Assignment.task_id == Task.id).exists()
+def not_assigned(db: Session, statuses: list[int], skip: int, limit: int):
+    subquery = (
+        ~db.query(Assignment.task_id).filter(Assignment.task_id == Task.id).exists()
+    )
     return (
         db.query(Task)
-        .filter(Task.status.in_(statues))
+        .filter(Task.status.in_(statuses))
         .filter(subquery)
         .order_by(desc(Task.priority), Task.id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+def not_resolved(db: Session, statuses: list[int], skip: int, limit: int, user_id: int):
+    return (
+        db.query(Task)
+        .join(Assignment)
+        .filter(Task.status.in_(statuses))
+        .filter(Assignment.user_id == user_id)
+        .order_by(desc(Task.status), desc(Task.priority), Task.id)
         .offset(skip)
         .limit(limit)
         .all()

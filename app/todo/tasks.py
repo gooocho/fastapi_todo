@@ -32,8 +32,8 @@ async def create_task(task: TaskCreate, db: Session = Depends(repository_session
     return crud_task.create(db=db, task=task)
 
 
-@tasks.get("/unresolved", response_model=List[Task], tags=["tasks"])
-async def unresolved_tasks(
+@tasks.get("/not_resolved", response_model=List[Task], tags=["tasks"])
+async def not_resolved_tasks(
     skip: int = 0, limit: int = 100, db: Session = Depends(repository_session)
 ):
     """
@@ -41,7 +41,7 @@ async def unresolved_tasks(
     ステータス(IN_PROGRESS -> NEW), 優先度(高->低), ID(低->高)の順で出力される
     """
     return crud_task.filterd_by_status(
-        db=db, statues=NOT_RESOLVED, skip=skip, limit=limit
+        db=db, statuses=NOT_RESOLVED, skip=skip, limit=limit
     )
 
 
@@ -53,4 +53,4 @@ async def not_assigned_tasks(
     誰にもアサインされていない未完了のタスクを取得する
     優先度(高->低), ID(低->高)の順で出力される
     """
-    return crud_task.not_assigned(db=db, statues=NOT_RESOLVED, skip=skip, limit=limit)
+    return crud_task.not_assigned(db=db, statuses=NOT_RESOLVED, skip=skip, limit=limit)

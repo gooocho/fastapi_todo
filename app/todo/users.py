@@ -6,9 +6,10 @@ from fastapi.routing import APIRouter
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.crud import crud_user
+from app.crud import crud_user, crud_task
 from app.repository.config import repository_session
 from app.schemas.user import User, UserCreate
+from app.schemas.task import Task, NOT_RESOLVED
 
 
 users = APIRouter(prefix="/users")
@@ -56,3 +57,16 @@ async def delete_user(user_id: int, db=Depends(repository_session)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return crud_user.delete_user(db=db, user_id=user_id)
+
+
+@users.get("/{user_id}/not_resolved", response_model=List[Task], tags=["users"])
+async def not_resolved_tasks(
+    user_id: int, skip: int = 0, limit: int = 100, db=Depends(repository_session)
+):
+    """
+    ユーザーが担当している未完了のタスクを取得する
+    ステータス(IN_PROGRESS -> NEW), 優先度(高->低), ID(低->高)の順で出力される
+    """
+    return crud_task.not_resolved(
+        db=db, statuses=NOT_RESOLVED, skip=skip, limit=limit, user_id=user_id
+    )
