@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from ...repository.config import Base
+from app.repository.config import Base
 from .assignment import Assignment
 
 
