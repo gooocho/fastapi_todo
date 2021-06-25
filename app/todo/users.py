@@ -46,3 +46,14 @@ async def read_user(user_id: int, db=Depends(repository_session)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
+
+@users.delete("/{user_id}", response_model=User, tags=["users"])
+async def delete_user(user_id: int, db=Depends(repository_session)):
+    """
+    ユーザーを削除する
+    """
+    db_user = crud_user.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return crud_user.delete_user(db=db, user_id=user_id)
