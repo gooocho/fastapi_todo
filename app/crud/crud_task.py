@@ -2,7 +2,6 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.models.assignment import Assignment
-from app.models.user import User
 from app.models.task import Task
 from app.schemas.task import TaskCreate
 

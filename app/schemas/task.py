@@ -1,6 +1,7 @@
 from enum import Enum, unique
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 @unique

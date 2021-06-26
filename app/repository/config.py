@@ -1,4 +1,3 @@
-from .postgresql import Base, postgres_db_session, engine
-
+from .postgresql import Base, engine, postgres_db_session
 
 repository_session = postgres_db_session

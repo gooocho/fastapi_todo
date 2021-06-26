@@ -1,15 +1,12 @@
-from fastapi.routing import APIRouter
-
 from typing import List
-from fastapi.routing import APIRouter
 
 from fastapi import Depends
+from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
 from app.crud import crud_task
 from app.repository.config import repository_session
-from app.schemas.task import Task, TaskCreate, NOT_RESOLVED
-
+from app.schemas.task import NOT_RESOLVED, Task, TaskCreate
 
 tasks = APIRouter(prefix="/tasks")
 

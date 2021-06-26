@@ -1,16 +1,13 @@
-from fastapi.routing import APIRouter
-
 from typing import List
-from fastapi.routing import APIRouter
 
 from fastapi import Depends, HTTPException
+from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
-from app.crud import crud_user, crud_task
+from app.crud import crud_task, crud_user
 from app.repository.config import repository_session
+from app.schemas.task import NOT_RESOLVED, Task
 from app.schemas.user import User, UserCreate
-from app.schemas.task import Task, NOT_RESOLVED
-
 
 users = APIRouter(prefix="/users")
 

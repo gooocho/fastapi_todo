@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from app.schemas.user import User
 from app.schemas.task import Task
+from app.schemas.user import User
 
 
 class AssignmentBase(BaseModel):
