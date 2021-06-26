@@ -18,7 +18,7 @@ async def read_tasks(
     """
     タスクをすべて取得する
     """
-    return crud_task.all(db, skip=skip, limit=limit)
+    return crud_task.all(db=db, skip=skip, limit=limit)
 
 
 @tasks.post("/", response_model=Task, tags=["tasks"])

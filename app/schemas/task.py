@@ -6,6 +6,11 @@ from pydantic import BaseModel
 
 @unique
 class TaskPriority(str, Enum):
+    """
+    優先度
+
+    数値が大きい＝優先度が高い
+    """
     LOW = 1
     BELOW_NORMAL = 2
     NORMAL = 3
@@ -15,6 +20,13 @@ class TaskPriority(str, Enum):
 
 @unique
 class TaskStatus(str, Enum):
+    """
+    ステータス
+
+    NEW: 未着手
+    IN_PROGRESS: 作業中
+    RESOLVED: 完了
+    """
     NEW = 1
     IN_PROGRESS = 2
     RESOLVED = 3
