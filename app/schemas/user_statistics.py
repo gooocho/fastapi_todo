@@ -1,13 +1,16 @@
 from pydantic import BaseModel
 
-from app.schemas.user import User
+
+class PriorityTaskCount(BaseModel):
+    priority: int
+    task_count: int
+
+
+class PriorityTaskCounts(BaseModel):
+    user_id: int
+    priority_task_counts: list[PriorityTaskCount]
 
 
 class TaskCount(BaseModel):
-    priority: int
-    count: int
-
-
-class UserTaskCounts(BaseModel):
-    user: User
-    task_counts: list[TaskCount]
+    user_id: int
+    task_count: int

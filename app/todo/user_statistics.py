@@ -1,23 +1,21 @@
-from typing import List
-
 from itertools import groupby
+from typing import List
 
 from fastapi import Depends
 from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
-from app.crud import crud_assignment, crud_user
+from app.crud import crud_user, crud_user_statistics
 from app.repository.config import repository_session
 from app.schemas.task import TaskStatus
-from app.schemas.user import User
-from app.schemas.user_statistics import UserTaskCounts, TaskCount
+from app.schemas.user_statistics import PriorityTaskCount, PriorityTaskCounts, TaskCount
 
 user_statistics = APIRouter(prefix="/user_statistics")
 
 
 @user_statistics.get(
     "/assigned_task_counts",
-    response_model=List[UserTaskCounts],
+    response_model=List[PriorityTaskCounts],
     tags=["user_statistics"],
 )
 async def assigned_task_counts(
@@ -29,7 +27,7 @@ async def assigned_task_counts(
     """
     users = crud_user.all(db=db, skip=skip, limit=limit)
 
-    assigned_task_counts = crud_assignment.assigned_task_counts(
+    assigned_task_counts = crud_user_statistics.assigned_task_counts(
         db=db, status=TaskStatus.IN_PROGRESS, user_ids=[user.id for user in users]
     )
 
@@ -39,12 +37,31 @@ async def assigned_task_counts(
     }
 
     return [
-        UserTaskCounts(
-            user=user,
-            task_counts=[
-                TaskCount(priority=row.priority, count=row.task_count)
+        PriorityTaskCounts(
+            user_id=user.id,
+            priority_task_counts=[
+                PriorityTaskCount(priority=row.priority, task_count=row.task_count)
                 for row in user_id_2_rows.get(user.id, [])
             ],
         )
         for user in users
     ]
+
+
+@user_statistics.get(
+    "/resolved_task_counts",
+    response_model=List[TaskCount],
+    tags=["user_statistics"],
+)
+async def resolved_task_counts(
+    skip: int = 0, limit: int = 100, db: Session = Depends(repository_session)
+):
+    """
+    ユーザーが完了させたタスクの数を集計する
+    完了させたタスクの数(多->少), ID(低->高)の順で出力される
+    １つもタスクを完了させていないユーザーも出現する
+    """
+    rows = crud_user_statistics.status_task_counts(
+        db=db, status=TaskStatus.RESOLVED, skip=skip, limit=limit
+    )
+    return [TaskCount(user_id=row.id, task_count=row.task_count) for row in rows]

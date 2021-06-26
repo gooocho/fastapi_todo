@@ -1,7 +1,7 @@
 from app.main import create_app
 from app.todo.assignments import assignments
-from app.todo.user_statistics import user_statistics
 from app.todo.tasks import tasks
+from app.todo.user_statistics import user_statistics
 from app.todo.users import users
 
 app = create_app()
