@@ -1,15 +1,15 @@
-from enum import Enum, unique
+from enum import IntEnum, unique
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 @unique
-class TaskPriority(str, Enum):
+class TaskPriority(IntEnum):
     """
     優先度
 
-    数値が大きい＝優先度が高い
+    数値が大きいと優先度が高い
     """
 
     LOW = 1
@@ -20,13 +20,13 @@ class TaskPriority(str, Enum):
 
 
 @unique
-class TaskStatus(str, Enum):
+class TaskStatus(IntEnum):
     """
     ステータス
 
-    NEW: 未着手
-    IN_PROGRESS: 作業中
-    RESOLVED: 完了
+    1: 未着手
+    2: 作業中
+    3: 完了
     """
 
     NEW = 1
@@ -37,18 +37,18 @@ class TaskStatus(str, Enum):
 NOT_RESOLVED = [TaskStatus.NEW, TaskStatus.IN_PROGRESS]
 
 
+class TaskId(BaseModel):
+    id: int
+
+
 class TaskBase(BaseModel):
     title: str
 
 
 class TaskCreate(TaskBase):
     description: str
-    priority: Optional[int] = TaskPriority.NORMAL
-    status: Optional[int] = TaskStatus.NEW
-
-
-class TaskId(BaseModel):
-    id: int
+    priority: Optional[TaskPriority] = Field(TaskPriority.NORMAL)
+    status: Optional[TaskStatus] = Field(TaskStatus.NEW)
 
 
 class Task(TaskBase):
