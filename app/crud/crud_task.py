@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.assignment import Assignment
 from app.models.task import Task
 from app.schemas.task import TaskCreate
+from app.schemas.user import UserId
 
 
 def all(db: Session, skip: int, limit: int):
@@ -49,12 +50,14 @@ def not_assigned(db: Session, statuses: list[int], skip: int, limit: int):
     )
 
 
-def not_resolved(db: Session, statuses: list[int], skip: int, limit: int, user_id: int):
+def not_resolved(
+    db: Session, statuses: list[int], skip: int, limit: int, user_id: UserId
+):
     return (
         db.query(Task)
         .join(Assignment)
         .filter(Task.status.in_(statuses))
-        .filter(Assignment.user_id == user_id)
+        .filter(Assignment.user_id == user_id.id)
         .order_by(desc(Task.status), desc(Task.priority), Task.id)
         .offset(skip)
         .limit(limit)

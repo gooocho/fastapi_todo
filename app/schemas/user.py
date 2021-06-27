@@ -10,6 +10,10 @@ class UserCreate(BaseUser):
     pass
 
 
+class UserId(BaseModel):
+    id: int
+
+
 class User(BaseUser):
     id: int
 

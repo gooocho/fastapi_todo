@@ -1,13 +1,16 @@
+from typing import List
+
 from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import coalesce
 
 from app.models.assignment import Assignment
-from app.models.user import User
 from app.models.task import Task
+from app.models.user import User
+from app.schemas.user import UserId
 
 
-def assigned_task_counts(db: Session, user_ids: list[int], status: int):
+def assigned_task_counts(db: Session, user_ids: List[UserId], status: int):
     return (
         db.query(
             Assignment.user_id,
@@ -15,7 +18,7 @@ def assigned_task_counts(db: Session, user_ids: list[int], status: int):
             func.count(Task.id).label("task_count"),
         )
         .join(Task)
-        .filter(Assignment.user_id.in_(user_ids))
+        .filter(Assignment.user_id.in_([user_id.id for user_id in user_ids]))
         .filter(Task.status == status)
         .group_by(Assignment.user_id, Task.priority)
         .order_by(Assignment.user_id, desc(Task.priority))

@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserId
 
 
-def find(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
+def find(db: Session, user_id: UserId):
+    return db.query(User).filter(User.id == user_id.id).first()
 
 
 def find_by_ids(db: Session, ids: list[int]):
@@ -20,6 +20,10 @@ def all(db: Session, skip: int, limit: int):
     return db.query(User).order_by(User.id).limit(limit).offset(skip).all()
 
 
+def all_id(db: Session, skip: int, limit: int):
+    return db.query(User.id).order_by(User.id).limit(limit).offset(skip).all()
+
+
 def create(db: Session, user: UserCreate):
     db_user = User(name=user.name, mail=user.mail)
     db.add(db_user)
@@ -28,8 +32,8 @@ def create(db: Session, user: UserCreate):
     return db_user
 
 
-def delete(db: Session, user_id: int):
-    db_user = db.query(User).get(user_id)
+def delete(db: Session, user_id: UserId):
+    db_user = db.query(User).get(user_id.id)
     db.delete(db_user)
     db.commit()
     return db_user

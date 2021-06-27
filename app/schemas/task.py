@@ -11,6 +11,7 @@ class TaskPriority(str, Enum):
 
     数値が大きい＝優先度が高い
     """
+
     LOW = 1
     BELOW_NORMAL = 2
     NORMAL = 3
@@ -27,6 +28,7 @@ class TaskStatus(str, Enum):
     IN_PROGRESS: 作業中
     RESOLVED: 完了
     """
+
     NEW = 1
     IN_PROGRESS = 2
     RESOLVED = 3
@@ -43,6 +45,10 @@ class TaskCreate(TaskBase):
     description: str
     priority: Optional[int] = TaskPriority.NORMAL
     status: Optional[int] = TaskStatus.NEW
+
+
+class TaskId(BaseModel):
+    id: int
 
 
 class Task(TaskBase):

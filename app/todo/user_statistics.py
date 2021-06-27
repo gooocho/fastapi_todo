@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.crud import crud_user, crud_user_statistics
 from app.repository.config import repository_session
 from app.schemas.task import TaskStatus
+from app.schemas.user import UserId
 from app.schemas.user_statistics import PriorityTaskCount, PriorityTaskCounts, TaskCount
 
 user_statistics = APIRouter(prefix="/user_statistics")
@@ -25,26 +26,26 @@ async def assigned_task_counts(
     ユーザーにアサインされている作業中のタスクの数を優先度別に集計する
     １つも作業中のタスクを持たないユーザーも出現する
     """
-    users = crud_user.all(db=db, skip=skip, limit=limit)
+    user_ids: List[UserId] = crud_user.all_id(db=db, skip=skip, limit=limit)
 
     assigned_task_counts = crud_user_statistics.assigned_task_counts(
-        db=db, status=TaskStatus.IN_PROGRESS, user_ids=[user.id for user in users]
+        db=db, user_ids=user_ids, status=TaskStatus.IN_PROGRESS
     )
 
-    user_id_2_rows = {
+    user_id_2_assigned_task_counts = {
         user_id: list(row)
         for user_id, row in groupby(assigned_task_counts, lambda row: row.user_id)
     }
 
     return [
         PriorityTaskCounts(
-            user_id=user.id,
+            user_id=user_id.id,
             priority_task_counts=[
                 PriorityTaskCount(priority=row.priority, task_count=row.task_count)
-                for row in user_id_2_rows.get(user.id, [])
+                for row in user_id_2_assigned_task_counts.get(user_id.id, [])
             ],
         )
-        for user in users
+        for user_id in user_ids
     ]
 
 
