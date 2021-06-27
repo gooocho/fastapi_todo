@@ -26,7 +26,7 @@ def assigned_task_counts(db: Session, user_ids: List[UserId], status: int):
     )
 
 
-def status_task_counts(db: Session, status: int, skip: int, limit: int):
+def status_task_counts(db: Session, status: int, limit: int, offset: int):
     subquery = (
         db.query(Assignment.user_id, func.count(Task.id).label("task_count"))
         .join(Task)
@@ -39,6 +39,6 @@ def status_task_counts(db: Session, status: int, skip: int, limit: int):
         .outerjoin(subquery)
         .order_by(desc(coalesce(subquery.c.task_count, 0)), User.id)
         .limit(limit)
-        .offset(skip)
+        .offset(offset)
         .all()
     )

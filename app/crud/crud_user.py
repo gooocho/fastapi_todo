@@ -16,12 +16,12 @@ def find_by_mail(db: Session, mail: str):
     return db.query(User).filter(User.mail == mail).first()
 
 
-def all(db: Session, skip: int, limit: int):
-    return db.query(User).order_by(User.id).limit(limit).offset(skip).all()
+def all(db: Session, limit: int, offset: int):
+    return db.query(User).order_by(User.id).limit(limit).offset(offset).all()
 
 
-def all_id(db: Session, skip: int, limit: int):
-    return db.query(User.id).order_by(User.id).limit(limit).offset(skip).all()
+def all_id(db: Session, limit: int, offset: int):
+    return db.query(User.id).order_by(User.id).limit(limit).offset(offset).all()
 
 
 def create(db: Session, user: UserCreate):

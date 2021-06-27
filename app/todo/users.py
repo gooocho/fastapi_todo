@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import crud_task, crud_user
 from app.repository.config import repository_session
+from app.schemas.pager import Pager
 from app.schemas.task import NOT_RESOLVED, Task
 from app.schemas.user import User, UserCreate, UserId
 
@@ -14,12 +15,12 @@ users = APIRouter(prefix="/users")
 
 @users.get("/", response_model=List[User], tags=["users"])
 async def read_users(
-    skip: int = 0, limit: int = 100, db: Session = Depends(repository_session)
+    pager: Pager = Depends(), db: Session = Depends(repository_session)
 ):
     """
     ユーザーをすべて取得する
     """
-    users = crud_user.all(db=db, skip=skip, limit=limit)
+    users = crud_user.all(db=db, limit=pager.per_page, offset=pager.offset())
     return users
 
 
@@ -58,9 +59,8 @@ async def delete_user(user_id: UserId = Depends(), db=Depends(repository_session
 
 @users.get("/{user_id}/not_resolved_tasks", response_model=List[Task], tags=["users"])
 async def not_resolved_tasks(
+    pager: Pager = Depends(),
     user_id: UserId = Depends(),
-    skip: int = 0,
-    limit: int = 100,
     db=Depends(repository_session),
 ):
     """
@@ -68,5 +68,9 @@ async def not_resolved_tasks(
     ステータス(IN_PROGRESS -> NEW), 優先度(高->低), ID(低->高)の順で出力される
     """
     return crud_task.not_resolved(
-        db=db, statuses=NOT_RESOLVED, skip=skip, limit=limit, user_id=user_id
+        db=db,
+        user_id=user_id,
+        statuses=NOT_RESOLVED,
+        limit=pager.per_page,
+        offset=pager.offset(),
     )

@@ -7,8 +7,8 @@ from app.schemas.task import TaskCreate
 from app.schemas.user import UserId
 
 
-def all(db: Session, skip: int, limit: int):
-    return db.query(Task).offset(skip).limit(limit).all()
+def all(db: Session, limit: int, offset: int):
+    return db.query(Task).limit(limit).offset(offset).all()
 
 
 def create(db: Session, task: TaskCreate):
@@ -24,18 +24,18 @@ def create(db: Session, task: TaskCreate):
     return db_task
 
 
-def filterd_by_status(db: Session, statuses: list[int], skip: int, limit: int):
+def filterd_by_status(db: Session, statuses: list[int], limit: int, offset: int):
     return (
         db.query(Task)
         .filter(Task.status.in_(statuses))
         .order_by(desc(Task.status), desc(Task.priority), Task.id)
-        .offset(skip)
         .limit(limit)
+        .offset(offset)
         .all()
     )
 
 
-def not_assigned(db: Session, statuses: list[int], skip: int, limit: int):
+def not_assigned(db: Session, statuses: list[int], limit: int, offset: int):
     subquery = (
         ~db.query(Assignment.task_id).filter(Assignment.task_id == Task.id).exists()
     )
@@ -44,14 +44,14 @@ def not_assigned(db: Session, statuses: list[int], skip: int, limit: int):
         .filter(Task.status.in_(statuses))
         .filter(subquery)
         .order_by(desc(Task.priority), Task.id)
-        .offset(skip)
         .limit(limit)
+        .offset(offset)
         .all()
     )
 
 
 def not_resolved(
-    db: Session, statuses: list[int], skip: int, limit: int, user_id: UserId
+    db: Session, user_id: UserId, statuses: list[int], limit: int, offset: int
 ):
     return (
         db.query(Task)
@@ -59,7 +59,7 @@ def not_resolved(
         .filter(Task.status.in_(statuses))
         .filter(Assignment.user_id == user_id.id)
         .order_by(desc(Task.status), desc(Task.priority), Task.id)
-        .offset(skip)
         .limit(limit)
+        .offset(offset)
         .all()
     )

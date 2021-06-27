@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import crud_user, crud_user_statistics
 from app.repository.config import repository_session
+from app.schemas.pager import Pager
 from app.schemas.task import TaskStatus
 from app.schemas.user import UserId
 from app.schemas.user_statistics import PriorityTaskCount, PriorityTaskCounts, TaskCount
@@ -20,13 +21,15 @@ user_statistics = APIRouter(prefix="/user_statistics")
     tags=["user_statistics"],
 )
 async def assigned_task_counts(
-    skip: int = 0, limit: int = 100, db: Session = Depends(repository_session)
+    pager: Pager = Depends(), db: Session = Depends(repository_session)
 ):
     """
     ユーザーにアサインされている作業中のタスクの数を優先度別に集計する
     １つも作業中のタスクを持たないユーザーも出現する
     """
-    user_ids: List[UserId] = crud_user.all_id(db=db, skip=skip, limit=limit)
+    user_ids: List[UserId] = crud_user.all_id(
+        db=db, limit=pager.per_page, offset=pager.offset()
+    )
 
     assigned_task_counts = crud_user_statistics.assigned_task_counts(
         db=db, user_ids=user_ids, status=TaskStatus.IN_PROGRESS
@@ -55,7 +58,7 @@ async def assigned_task_counts(
     tags=["user_statistics"],
 )
 async def resolved_task_counts(
-    skip: int = 0, limit: int = 100, db: Session = Depends(repository_session)
+    pager: Pager = Depends(), db: Session = Depends(repository_session)
 ):
     """
     ユーザーが完了させたタスクの数を集計する
@@ -63,6 +66,6 @@ async def resolved_task_counts(
     １つもタスクを完了させていないユーザーも出現する
     """
     rows = crud_user_statistics.status_task_counts(
-        db=db, status=TaskStatus.RESOLVED, skip=skip, limit=limit
+        db=db, status=TaskStatus.RESOLVED, limit=pager.per_page, offset=pager.offset()
     )
     return [TaskCount(user_id=row.id, task_count=row.task_count) for row in rows]
