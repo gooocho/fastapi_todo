@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.models.assignment import Assignment
 from app.models.task import Task
-from app.schemas.task import TaskCreate
+from app.schemas.task import TaskCreate, TaskUpdate
 from app.schemas.user import UserId
 
 
@@ -22,6 +22,15 @@ def create(db: Session, task: TaskCreate):
     db.commit()
     db.refresh(db_task)
     return db_task
+
+
+def update(db: Session, task: TaskUpdate):
+    db_task = db.query(Task).filter(Task.id == task.id)
+    compacted = {k: v for (k, v) in task.dict().items() if v is not None and k != "id"}
+    if len(compacted):
+        db_task.update(compacted)
+        db.commit()
+    return db_task.first()
 
 
 def filterd_by_status(db: Session, statuses: list[int], limit: int, offset: int):

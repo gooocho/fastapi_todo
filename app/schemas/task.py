@@ -51,6 +51,14 @@ class TaskCreate(TaskBase):
     status: Optional[TaskStatus] = Field(TaskStatus.NEW)
 
 
+class TaskUpdate(TaskBase):
+    id: int
+    title: Optional[str]
+    description: Optional[str]
+    priority: Optional[TaskPriority]
+    status: Optional[TaskStatus]
+
+
 class Task(TaskBase):
     id: int
     description: str

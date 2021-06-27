@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.crud import crud_task
 from app.repository.config import repository_session
 from app.schemas.pager import Pager
-from app.schemas.task import NOT_RESOLVED, Task, TaskCreate
+from app.schemas.task import NOT_RESOLVED, Task, TaskCreate, TaskId, TaskUpdate
 
 tasks = APIRouter(prefix="/tasks")
 
@@ -22,12 +22,30 @@ async def read_tasks(
     return crud_task.all(db=db, limit=pager.per_page, offset=pager.offset())
 
 
+@tasks.get("/", response_model=Task, tags=["tasks"])
+async def read_tasks(
+    task_id: TaskId, db=Depends(repository_session)
+):
+    """
+    IDを指定してタスクを1つ取得する
+    """
+    return crud_task.find(db=db, task_id=task_id)
+
+
 @tasks.post("/", response_model=Task, tags=["tasks"])
 async def create_task(task: TaskCreate, db: Session = Depends(repository_session)):
     """
     タスクを登録する
     """
     return crud_task.create(db=db, task=task)
+
+
+@tasks.put("/{task_id}", response_model=Task, tags=["tasks"])
+async def update_task(task: TaskUpdate, db: Session = Depends(repository_session)):
+    """
+    タスクを更新する
+    """
+    return crud_task.update(db=db, task=task)
 
 
 @tasks.get("/not_resolved", response_model=List[Task], tags=["tasks"])

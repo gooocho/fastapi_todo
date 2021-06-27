@@ -8,7 +8,7 @@ from app.crud import crud_task, crud_user
 from app.repository.config import repository_session
 from app.schemas.pager import Pager
 from app.schemas.task import NOT_RESOLVED, Task
-from app.schemas.user import User, UserCreate, UserId
+from app.schemas.user import User, UserCreate, UserId, UserUpdate
 
 users = APIRouter(prefix="/users")
 
@@ -24,6 +24,17 @@ async def read_users(
     return users
 
 
+@users.get("/{user_id}", response_model=User, tags=["users"])
+async def read_user(user_id: UserId = Depends(), db=Depends(repository_session)):
+    """
+    IDを指定してユーザーを1つ取得する
+    """
+    db_user = crud_user.find(db=db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
+
 @users.post("/", response_model=User, tags=["users"])
 async def create_user(user: UserCreate, db: Session = Depends(repository_session)):
     """
@@ -31,19 +42,19 @@ async def create_user(user: UserCreate, db: Session = Depends(repository_session
     """
     db_user = crud_user.find_by_mail(db=db, mail=user.mail)
     if db_user:
-        raise HTTPException(status_code=400, detail="mail already registered")
-    return crud_user.create(db=db, user=user)
+        raise HTTPException(status_code=400, detail="Email address is already registered")
+    return crud_user.update(db=db, user=user)
 
 
-@users.get("/{user_id}", response_model=User, tags=["users"])
-async def read_user(user_id: UserId = Depends(), db=Depends(repository_session)):
+@users.put("/{user_id}", response_model=User, tags=["users"])
+async def update_user(user: UserUpdate, db: Session = Depends(repository_session)):
     """
-    ユーザーIDを指定してユーザーを1つ取得する
+    ユーザーを更新する
     """
-    db_user = crud_user.find(db=db, user_id=user_id)
+    db_user = crud_user.find_by_id(db=db, user_id=UserId(id=user.id))
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+        raise HTTPException(status_code=400, detail="User not found")
+    return crud_user.update(db=db, user=user)
 
 
 @users.delete("/{user_id}", response_model=User, tags=["users"])

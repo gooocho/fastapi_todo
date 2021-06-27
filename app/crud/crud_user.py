@@ -1,15 +1,15 @@
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.schemas.user import UserCreate, UserId
+from app.schemas.user import UserCreate, UserId, UserUpdate
 
 
 def find(db: Session, user_id: UserId):
     return db.query(User).filter(User.id == user_id.id).first()
 
 
-def find_by_ids(db: Session, ids: list[int]):
-    return db.query(User).filter(User.id.in_(ids)).order_by(User.id).all()
+def find_by_id(db: Session, user_id: UserId):
+    return db.query(User).filter(User.id == user_id.id).order_by(User.id).all()
 
 
 def find_by_mail(db: Session, mail: str):
@@ -30,6 +30,15 @@ def create(db: Session, user: UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def update(db: Session, user: UserUpdate):
+    db_user = db.query(User).filter(User.id == user.id)
+    compacted = {k: v for (k, v) in user.dict().items() if v is not None and k != "id"}
+    if len(compacted):
+        db_user.update(compacted)
+        db.commit()
+    return db_user.first()
 
 
 def delete(db: Session, user_id: UserId):
