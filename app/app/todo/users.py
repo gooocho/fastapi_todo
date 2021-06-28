@@ -43,7 +43,7 @@ async def create_user(user: UserCreate, db: Session = Depends(repository_session
     db_user = crud_user.find_by_mail(db=db, mail=user.mail)
     if db_user:
         raise HTTPException(
-            status_code=400, detail="Email address is already registered"
+            status_code=400, detail="Email address is already in use"
         )
     return crud_user.create(db=db, user=user)
 
