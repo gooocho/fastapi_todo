@@ -71,7 +71,7 @@ async def delete_user(user_id: int, db=Depends(repository_session)):
     return crud_user.delete(db=db, user_id=user_id)
 
 
-@users.get("/not_resolved_tasks/{user_id}", response_model=List[Task], tags=["users"])
+@users.get("/{user_id}/tasks/not_resolved", response_model=List[Task], tags=["users"])
 async def not_resolved_tasks(
     user_id: int,
     pager: Pager = Depends(),
