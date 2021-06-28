@@ -1,5 +1,6 @@
-import psycopg2
 import time
+
+import psycopg2
 
 DATABASE_URL = "postgresql://postgres:postgres@fastapi_todo_db:5432/fastapi_todo"
 

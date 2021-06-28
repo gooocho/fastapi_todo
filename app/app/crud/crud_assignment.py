@@ -1,15 +1,23 @@
 from sqlalchemy.orm import Session
 
-from app.models.task import Task
-from app.models.user import User
-from app.schemas.assignment import Assignment
+from app.models.assignment import Assignment
+from app.schemas.assignment import AssignmentCreate
+from app.schemas.task import TaskId
+from app.schemas.user import UserId
 
 
-def assign(db: Session, assignment: Assignment):
-    db_user = db.query(User).get(assignment.user_id)
-    db_task = db.query(Task).get(assignment.task_id)
-    db_user.tasks.append(db_task)
-    db.add(db_user)
+def find(db: Session, user_id: UserId, task_id: TaskId):
+    return (
+        db.query(Assignment)
+        .filter(Assignment.user_id == user_id.id)
+        .filter(Assignment.task_id == task_id.id)
+        .first()
+    )
+
+
+def create(db: Session, assignment: AssignmentCreate):
+    db_assignment = Assignment(user_id=assignment.user_id, task_id=assignment.task_id)
+    db.add(db_assignment)
     db.commit()
-    db.refresh(db_user)
-    return [db_user, db_task]
+    db.refresh(db_assignment)
+    return db_assignment

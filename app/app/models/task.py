@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.models.assignment import Assignment
 from app.db.settings import Base
+from app.models.assignment import Assignment
 
 
 class Task(Base):

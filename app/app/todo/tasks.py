@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
@@ -27,7 +27,9 @@ async def get_task(task_id: int, db=Depends(db_session)):
     """
     db_task = crud_task.find(db=db, task_id=TaskId(id=task_id))
     if db_task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
     return db_task
 
 
@@ -44,6 +46,11 @@ async def update_task(task: TaskUpdate, db: Session = Depends(db_session)):
     """
     タスクを更新する
     """
+    db_task = crud_task.find(db=db, task_id=TaskId(id=task.id))
+    if db_task is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
     return crud_task.update(db=db, task=task)
 
 

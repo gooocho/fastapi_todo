@@ -12,6 +12,7 @@ from app.schemas.user import UserId
 def find(db: Session, task_id: TaskId):
     return db.query(Task).filter(Task.id == task_id.id).first()
 
+
 def all(db: Session, limit: int, offset: int):
     return db.query(Task).limit(limit).offset(offset).all()
 

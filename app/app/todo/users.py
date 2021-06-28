@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
@@ -29,18 +29,25 @@ async def get_user(user_id: int, db=Depends(db_session)):
     """
     db_user = crud_user.find(db=db, user_id=UserId(id=user_id))
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
     return db_user
 
 
-@users.post("/create", response_model=User, tags=["users"])
+@users.post(
+    "/create", response_model=User, status_code=status.HTTP_201_CREATED, tags=["users"]
+)
 async def create_user(user: UserCreate, db: Session = Depends(db_session)):
     """
     ユーザーを登録する
     """
     db_user = crud_user.find_by_mail(db=db, mail=user.mail)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email address is already in use")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email address is already in use",
+        )
     return crud_user.create(db=db, user=user)
 
 
@@ -51,19 +58,28 @@ async def update_user(user: UserUpdate, db: Session = Depends(db_session)):
     """
     db_user = crud_user.find_by_id(db=db, user_id=UserId(id=user.id))
     if db_user is None:
-        raise HTTPException(status_code=400, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
     return crud_user.update(db=db, user=user)
 
 
-@users.delete("/delete/", response_model=User, tags=["users"])
+@users.delete(
+    "/delete/",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["users"],
+)
 async def delete_user(user_id: int, db=Depends(db_session)):
     """
     ユーザーを削除する
     """
     db_user = crud_user.find(db=db, user_id=UserId(id=user_id))
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return crud_user.delete(db=db, user_id=user_id)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    crud_user.delete(db=db, user_id=user_id)
 
 
 @users.get("/{user_id}/tasks/not_resolved", response_model=List[Task], tags=["users"])
@@ -76,6 +92,11 @@ async def not_resolved_tasks(
     ユーザーが担当している未完了のタスクを取得する
     ステータス(IN_PROGRESS -> NEW), 優先度(高->低), ID(低->高)の順で出力される
     """
+    db_user = crud_user.find(db=db, user_id=UserId(id=user_id))
+    if db_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
     return crud_task.not_resolved(
         db=db,
         user_id=UserId(id=user_id),
