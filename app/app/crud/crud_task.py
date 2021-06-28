@@ -1,11 +1,16 @@
+from typing import List
+
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.models.assignment import Assignment
 from app.models.task import Task
-from app.schemas.task import TaskCreate, TaskUpdate
+from app.schemas.task import TaskCreate, TaskId, TaskUpdate
 from app.schemas.user import UserId
 
+
+def find(db: Session, task_id: TaskId):
+    return db.query(Task).filter(Task.id == task_id.id).first()
 
 def all(db: Session, limit: int, offset: int):
     return db.query(Task).limit(limit).offset(offset).all()
@@ -33,7 +38,7 @@ def update(db: Session, task: TaskUpdate):
     return db_task.first()
 
 
-def filterd_by_status(db: Session, statuses: list[int], limit: int, offset: int):
+def filterd_by_status(db: Session, statuses: List[int], limit: int, offset: int):
     return (
         db.query(Task)
         .filter(Task.status.in_(statuses))
@@ -44,7 +49,7 @@ def filterd_by_status(db: Session, statuses: list[int], limit: int, offset: int)
     )
 
 
-def not_assigned(db: Session, statuses: list[int], limit: int, offset: int):
+def not_assigned(db: Session, statuses: List[int], limit: int, offset: int):
     subquery = (
         ~db.query(Assignment.task_id).filter(Assignment.task_id == Task.id).exists()
     )
@@ -60,7 +65,7 @@ def not_assigned(db: Session, statuses: list[int], limit: int, offset: int):
 
 
 def not_resolved(
-    db: Session, user_id: UserId, statuses: list[int], limit: int, offset: int
+    db: Session, user_id: UserId, statuses: List[int], limit: int, offset: int
 ):
     return (
         db.query(Task)

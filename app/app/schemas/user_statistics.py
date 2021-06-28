@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel
 
 
@@ -8,7 +10,7 @@ class PriorityTaskCount(BaseModel):
 
 class PriorityTaskCounts(BaseModel):
     user_id: int
-    priority_task_counts: list[PriorityTaskCount]
+    priority_task_counts: List[PriorityTaskCount]
 
 
 class TaskCount(BaseModel):

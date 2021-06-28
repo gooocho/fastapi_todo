@@ -25,11 +25,11 @@ async def read_users(
 
 
 @users.get("/{user_id}", response_model=User, tags=["users"])
-async def read_user(user_id: UserId = Depends(), db=Depends(repository_session)):
+async def read_user(user_id: int, db=Depends(repository_session)):
     """
     IDを指定してユーザーを1つ取得する
     """
-    db_user = crud_user.find(db=db, user_id=user_id)
+    db_user = crud_user.find(db=db, user_id=UserId(id=user_id))
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
@@ -43,7 +43,7 @@ async def create_user(user: UserCreate, db: Session = Depends(repository_session
     db_user = crud_user.find_by_mail(db=db, mail=user.mail)
     if db_user:
         raise HTTPException(status_code=400, detail="Email address is already registered")
-    return crud_user.update(db=db, user=user)
+    return crud_user.create(db=db, user=user)
 
 
 @users.put("/{user_id}", response_model=User, tags=["users"])
@@ -58,11 +58,11 @@ async def update_user(user: UserUpdate, db: Session = Depends(repository_session
 
 
 @users.delete("/{user_id}", response_model=User, tags=["users"])
-async def delete_user(user_id: UserId = Depends(), db=Depends(repository_session)):
+async def delete_user(user_id: int, db=Depends(repository_session)):
     """
     ユーザーを削除する
     """
-    db_user = crud_user.find(db=db, user_id=user_id)
+    db_user = crud_user.find(db=db, user_id=UserId(id=user_id))
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return crud_user.delete(db=db, user_id=user_id)
@@ -70,8 +70,8 @@ async def delete_user(user_id: UserId = Depends(), db=Depends(repository_session
 
 @users.get("/{user_id}/not_resolved_tasks", response_model=List[Task], tags=["users"])
 async def not_resolved_tasks(
+    user_id: int,
     pager: Pager = Depends(),
-    user_id: UserId = Depends(),
     db=Depends(repository_session),
 ):
     """
@@ -80,7 +80,7 @@ async def not_resolved_tasks(
     """
     return crud_task.not_resolved(
         db=db,
-        user_id=user_id,
+        user_id=UserId(id=user_id),
         statuses=NOT_RESOLVED,
         limit=pager.per_page,
         offset=pager.offset(),
