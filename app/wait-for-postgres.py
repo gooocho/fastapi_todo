@@ -1,8 +1,16 @@
+import os
 import time
 
 import psycopg2
 
-DATABASE_URL = "postgresql://postgres:postgres@fastapi_todo_db:5432/fastapi_todo"
+
+def get_url():
+    user = os.getenv("POSTGRES_USER", "postgres")
+    password = os.getenv("POSTGRES_PASSWORD", "")
+    server = os.getenv("POSTGRES_SERVER", "db")
+    port = os.getenv("POSTGRES_PORT", "db")
+    db = os.getenv("POSTGRES_DB", "app")
+    return f"postgresql://{user}:{password}@{server}:{port}/{db}"
 
 
 def main():
@@ -11,7 +19,7 @@ def main():
     while count < 10:
         try:
             print(f"try {count}")
-            cursor = psycopg2.connect(DATABASE_URL)
+            cursor = psycopg2.connect(get_url())
             print(cursor)
             break
         except psycopg2.OperationalError:
