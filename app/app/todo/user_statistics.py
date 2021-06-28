@@ -6,7 +6,7 @@ from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
 from app.crud import crud_user, crud_user_statistics
-from app.repository.config import repository_session
+from app.db.settings import db_session
 from app.schemas.pager import Pager
 from app.schemas.task import TaskStatus
 from app.schemas.user import UserId
@@ -21,7 +21,7 @@ user_statistics = APIRouter(prefix="/user_statistics")
     tags=["user_statistics"],
 )
 async def assigned_task_counts(
-    pager: Pager = Depends(), db: Session = Depends(repository_session)
+    pager: Pager = Depends(), db: Session = Depends(db_session)
 ):
     """
     ユーザーにアサインされている作業中のタスクの数を優先度別に集計する
@@ -58,7 +58,7 @@ async def assigned_task_counts(
     tags=["user_statistics"],
 )
 async def resolved_task_counts(
-    pager: Pager = Depends(), db: Session = Depends(repository_session)
+    pager: Pager = Depends(), db: Session = Depends(db_session)
 ):
     """
     ユーザーが完了させたタスクの数を集計する

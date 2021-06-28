@@ -5,7 +5,7 @@ from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
 from app.crud import crud_task, crud_user
-from app.repository.config import repository_session
+from app.db.settings import db_session
 from app.schemas.pager import Pager
 from app.schemas.task import NOT_RESOLVED, Task
 from app.schemas.user import User, UserCreate, UserId, UserUpdate
@@ -14,9 +14,7 @@ users = APIRouter(prefix="/users")
 
 
 @users.get("/list", response_model=List[User], tags=["users"])
-async def list_users(
-    pager: Pager = Depends(), db: Session = Depends(repository_session)
-):
+async def list_users(pager: Pager = Depends(), db: Session = Depends(db_session)):
     """
     ユーザーをすべて取得する
     """
@@ -25,7 +23,7 @@ async def list_users(
 
 
 @users.get("/get/{user_id}", response_model=User, tags=["users"])
-async def get_user(user_id: int, db=Depends(repository_session)):
+async def get_user(user_id: int, db=Depends(db_session)):
     """
     IDを指定してユーザーを1つ取得する
     """
@@ -36,20 +34,18 @@ async def get_user(user_id: int, db=Depends(repository_session)):
 
 
 @users.post("/create", response_model=User, tags=["users"])
-async def create_user(user: UserCreate, db: Session = Depends(repository_session)):
+async def create_user(user: UserCreate, db: Session = Depends(db_session)):
     """
     ユーザーを登録する
     """
     db_user = crud_user.find_by_mail(db=db, mail=user.mail)
     if db_user:
-        raise HTTPException(
-            status_code=400, detail="Email address is already in use"
-        )
+        raise HTTPException(status_code=400, detail="Email address is already in use")
     return crud_user.create(db=db, user=user)
 
 
 @users.put("/update/", response_model=User, tags=["users"])
-async def update_user(user: UserUpdate, db: Session = Depends(repository_session)):
+async def update_user(user: UserUpdate, db: Session = Depends(db_session)):
     """
     ユーザーを更新する
     """
@@ -59,9 +55,8 @@ async def update_user(user: UserUpdate, db: Session = Depends(repository_session
     return crud_user.update(db=db, user=user)
 
 
-
 @users.delete("/delete/", response_model=User, tags=["users"])
-async def delete_user(user_id: int, db=Depends(repository_session)):
+async def delete_user(user_id: int, db=Depends(db_session)):
     """
     ユーザーを削除する
     """
@@ -75,7 +70,7 @@ async def delete_user(user_id: int, db=Depends(repository_session)):
 async def not_resolved_tasks(
     user_id: int,
     pager: Pager = Depends(),
-    db=Depends(repository_session),
+    db=Depends(db_session),
 ):
     """
     ユーザーが担当している未完了のタスクを取得する

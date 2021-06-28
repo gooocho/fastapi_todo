@@ -5,7 +5,7 @@ from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
 from app.crud import crud_task
-from app.repository.config import repository_session
+from app.db.settings import db_session
 from app.schemas.pager import Pager
 from app.schemas.task import NOT_RESOLVED, Task, TaskCreate, TaskId, TaskUpdate
 
@@ -13,9 +13,7 @@ tasks = APIRouter(prefix="/tasks")
 
 
 @tasks.get("/list", response_model=List[Task], tags=["tasks"])
-async def list_tasks(
-    pager: Pager = Depends(), db: Session = Depends(repository_session)
-):
+async def list_tasks(pager: Pager = Depends(), db: Session = Depends(db_session)):
     """
     タスクをすべて取得する
     """
@@ -23,7 +21,7 @@ async def list_tasks(
 
 
 @tasks.get("/get/{task_id}", response_model=Task, tags=["tasks"])
-async def get_task(task_id: int, db=Depends(repository_session)):
+async def get_task(task_id: int, db=Depends(db_session)):
     """
     IDを指定してタスクを1つ取得する
     """
@@ -34,7 +32,7 @@ async def get_task(task_id: int, db=Depends(repository_session)):
 
 
 @tasks.post("/create", response_model=Task, tags=["tasks"])
-async def create_task(task: TaskCreate, db: Session = Depends(repository_session)):
+async def create_task(task: TaskCreate, db: Session = Depends(db_session)):
     """
     タスクを登録する
     """
@@ -42,7 +40,7 @@ async def create_task(task: TaskCreate, db: Session = Depends(repository_session
 
 
 @tasks.put("/update", response_model=Task, tags=["tasks"])
-async def update_task(task: TaskUpdate, db: Session = Depends(repository_session)):
+async def update_task(task: TaskUpdate, db: Session = Depends(db_session)):
     """
     タスクを更新する
     """
@@ -51,7 +49,7 @@ async def update_task(task: TaskUpdate, db: Session = Depends(repository_session
 
 @tasks.get("/not_resolved", response_model=List[Task], tags=["tasks"])
 async def not_resolved_tasks(
-    pager: Pager = Depends(), db: Session = Depends(repository_session)
+    pager: Pager = Depends(), db: Session = Depends(db_session)
 ):
     """
     未完了のタスク(NEW / IN_PROGRESS)を取得する
@@ -64,7 +62,7 @@ async def not_resolved_tasks(
 
 @tasks.get("/not_assigned", response_model=List[Task], tags=["tasks"])
 async def not_assigned_tasks(
-    pager: Pager = Depends(), db: Session = Depends(repository_session)
+    pager: Pager = Depends(), db: Session = Depends(db_session)
 ):
     """
     誰にもアサインされていない未完了のタスクを取得する

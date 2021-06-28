@@ -11,7 +11,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def postgres_db_session():
+def db_session():
     try:
         session_local = SessionLocal()
         yield session_local

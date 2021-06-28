@@ -16,7 +16,7 @@ fileConfig(config.config_file_name)
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from todo.database import Base
-from app.repository.config import Base  # noqa
+from app.db.settings import Base  # noqa
 
 target_metadata = Base.metadata
 

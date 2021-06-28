@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer
 
-from app.repository.config import Base
+from app.db.settings import Base
 
 
 class Assignment(Base):
