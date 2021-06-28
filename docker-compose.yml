@@ -24,5 +24,7 @@ services:
       - "0.0.0.0:8080:80"
     volumes:
       - ./app:/app
+    env_file:
+      - .env
     command:
-      sh -c 'python3 wait-for-postgres.py && python3 -m alembic upgrade head && python3 runner.py'
+      sh -c 'python3 wait-for-postgres.py && python3 -m alembic upgrade head && python3 -m uvicorn --app-dir=./app main:app'

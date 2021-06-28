@@ -1,5 +1,7 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
+COPY ./app /app
+ENV PYTHONPATH=/app
 WORKDIR /app
 
 COPY app/requirements.txt requirements.txt
