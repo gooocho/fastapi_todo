@@ -30,7 +30,7 @@ async def create_task(task: TaskCreate, db: Session = Depends(repository_session
     return crud_task.create(db=db, task=task)
 
 
-@tasks.put("/{task_id}", response_model=Task, tags=["tasks"])
+@tasks.put("/", response_model=Task, tags=["tasks"])
 async def update_task(task: TaskUpdate, db: Session = Depends(repository_session)):
     """
     タスクを更新する

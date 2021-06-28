@@ -42,11 +42,13 @@ async def create_user(user: UserCreate, db: Session = Depends(repository_session
     """
     db_user = crud_user.find_by_mail(db=db, mail=user.mail)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email address is already registered")
+        raise HTTPException(
+            status_code=400, detail="Email address is already registered"
+        )
     return crud_user.create(db=db, user=user)
 
 
-@users.put("/{user_id}", response_model=User, tags=["users"])
+@users.put("/", response_model=User, tags=["users"])
 async def update_user(user: UserUpdate, db: Session = Depends(repository_session)):
     """
     ユーザーを更新する
@@ -57,7 +59,7 @@ async def update_user(user: UserUpdate, db: Session = Depends(repository_session
     return crud_user.update(db=db, user=user)
 
 
-@users.delete("/{user_id}", response_model=User, tags=["users"])
+@users.delete("/", response_model=User, tags=["users"])
 async def delete_user(user_id: int, db=Depends(repository_session)):
     """
     ユーザーを削除する
