@@ -13,8 +13,8 @@ from app.schemas.user import User, UserCreate, UserId, UserUpdate
 users = APIRouter(prefix="/users")
 
 
-@users.get("/", response_model=List[User], tags=["users"])
-async def read_users(
+@users.get("/list", response_model=List[User], tags=["users"])
+async def list_users(
     pager: Pager = Depends(), db: Session = Depends(repository_session)
 ):
     """
@@ -24,8 +24,8 @@ async def read_users(
     return users
 
 
-@users.get("/{user_id}", response_model=User, tags=["users"])
-async def read_user(user_id: int, db=Depends(repository_session)):
+@users.get("/get/{user_id}", response_model=User, tags=["users"])
+async def get_user(user_id: int, db=Depends(repository_session)):
     """
     IDを指定してユーザーを1つ取得する
     """
@@ -35,7 +35,7 @@ async def read_user(user_id: int, db=Depends(repository_session)):
     return db_user
 
 
-@users.post("/", response_model=User, tags=["users"])
+@users.post("/create", response_model=User, tags=["users"])
 async def create_user(user: UserCreate, db: Session = Depends(repository_session)):
     """
     ユーザーを登録する
@@ -48,7 +48,7 @@ async def create_user(user: UserCreate, db: Session = Depends(repository_session
     return crud_user.create(db=db, user=user)
 
 
-@users.put("/", response_model=User, tags=["users"])
+@users.put("/update/", response_model=User, tags=["users"])
 async def update_user(user: UserUpdate, db: Session = Depends(repository_session)):
     """
     ユーザーを更新する
@@ -59,7 +59,8 @@ async def update_user(user: UserUpdate, db: Session = Depends(repository_session
     return crud_user.update(db=db, user=user)
 
 
-@users.delete("/", response_model=User, tags=["users"])
+
+@users.delete("/delete/", response_model=User, tags=["users"])
 async def delete_user(user_id: int, db=Depends(repository_session)):
     """
     ユーザーを削除する
@@ -70,7 +71,7 @@ async def delete_user(user_id: int, db=Depends(repository_session)):
     return crud_user.delete(db=db, user_id=user_id)
 
 
-@users.get("/{user_id}/not_resolved_tasks", response_model=List[Task], tags=["users"])
+@users.get("/not_resolved_tasks/{user_id}", response_model=List[Task], tags=["users"])
 async def not_resolved_tasks(
     user_id: int,
     pager: Pager = Depends(),
