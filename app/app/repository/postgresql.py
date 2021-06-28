@@ -2,11 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = (
-    "postgresql://postgres:postgres@fastapi_todo_db:5432/fastapi_todo"
-)
+from app.core.config import settings
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True, echo=True)
+engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True, echo=True)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

@@ -1,8 +1,9 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config, pool
+import os
 
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,6 +26,15 @@ target_metadata = Base.metadata
 # ... etc.
 
 
+def get_url():
+    user = os.getenv("POSTGRES_USER", "postgres")
+    password = os.getenv("POSTGRES_PASSWORD", "")
+    server = os.getenv("POSTGRES_SERVER", "db")
+    port = os.getenv("POSTGRES_PORT", "db")
+    db = os.getenv("POSTGRES_DB", "app")
+    return f"postgresql://{user}:{password}@{server}:{port}/{db}"
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -37,7 +47,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = get_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -63,9 +73,7 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
