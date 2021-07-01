@@ -26,5 +26,3 @@ services:
       - ./app:/app
     env_file:
       - .env
-    command:
-      sh -c 'python3 wait-for-postgres.py && python3 -m alembic upgrade head && python3 -m uvicorn --app-dir=./app main:app'
