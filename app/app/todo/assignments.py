@@ -11,8 +11,13 @@ from app.schemas.user import UserId
 assignments = APIRouter(prefix="/assignments")
 
 
-@assignments.post("/create", response_model=Assignment, tags=["assignments"])
-async def create(
+@assignments.post(
+    "/create",
+    response_model=Assignment,
+    status_code=status.HTTP_201_CREATED,
+    tags=["assignments"],
+)
+async def create_assignment(
     assignment: AssignmentCreate,
     db: Session = Depends(db_session),
 ):
@@ -38,7 +43,7 @@ async def create(
     if db_assignment is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Assignment already presents"
+            detail="Assignment already presents",
         )
 
     return crud_assignment.create(db=db, assignment=assignment)
