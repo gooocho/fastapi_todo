@@ -9,7 +9,7 @@ def find(db: Session, user_id: UserId):
 
 
 def find_by_id(db: Session, user_id: UserId):
-    return db.query(User).filter(User.id == user_id.id).order_by(User.id).all()
+    return db.query(User).filter(User.id == user_id.id).order_by(User.id).first()
 
 
 def find_by_mail(db: Session, mail: str):
