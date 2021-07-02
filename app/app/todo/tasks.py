@@ -33,7 +33,9 @@ async def get_task(task_id: int, db=Depends(db_session)):
     return db_task
 
 
-@tasks.post("/create", response_model=Task, tags=["tasks"])
+@tasks.post(
+    "/create", response_model=Task, status_code=status.HTTP_201_CREATED, tags=["tasks"]
+)
 async def create_task(task: TaskCreate, db: Session = Depends(db_session)):
     """
     タスクを登録する
