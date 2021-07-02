@@ -3,7 +3,7 @@ from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
 
-from app.db.settings import SessionLocal
+from app.db.settings import db_session, SessionLocal
 from app.main import app
 
 
@@ -85,10 +85,14 @@ def db() -> Generator:
     yield SessionLocal()
 
 
-@pytest.fixture(scope="module")
-def client() -> Generator:
+@pytest.fixture(scope="function")
+def client(sample_db) -> Generator:
+    def sample_db_gen():
+        yield sample_db
+    app.dependency_overrides[db_session] = sample_db_gen
     with TestClient(app) as test_client:
         yield test_client
+    app.dependency_overrides[db_session] = db_session
 
 
 @pytest.fixture(scope="function")

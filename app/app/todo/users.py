@@ -51,7 +51,7 @@ async def create_user(user: UserCreate, db: Session = Depends(db_session)):
     return crud_user.create(db=db, user=user)
 
 
-@users.put("/update/", response_model=User, tags=["users"])
+@users.put("/update", response_model=User, tags=["users"])
 async def update_user(user: UserUpdate, db: Session = Depends(db_session)):
     """
     ユーザーを更新する
@@ -65,7 +65,7 @@ async def update_user(user: UserUpdate, db: Session = Depends(db_session)):
 
 
 @users.delete(
-    "/delete/",
+    "/delete/{user_id}",
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
     tags=["users"],
@@ -79,7 +79,7 @@ async def delete_user(user_id: int, db=Depends(db_session)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
-    crud_user.delete(db=db, user_id=user_id)
+    crud_user.delete(db=db, user_id=UserId(id=user_id))
 
 
 @users.get("/{user_id}/tasks/not_resolved", response_model=List[Task], tags=["users"])
