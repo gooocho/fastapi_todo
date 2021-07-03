@@ -11,7 +11,7 @@ from app.schemas.user import UserId
 
 def find(db: Session, task_id: TaskId):
     """
-    tasks テーブルから１件エントリを取得する。
+    id で検索してタスク１件を取得する。
 
     Parameters
     ----------
@@ -23,14 +23,14 @@ def find(db: Session, task_id: TaskId):
     Returns
     -------
     ModelTask | None
-        検索されたエントリ。
+        検索されたタスク。
     """
     return db.query(ModelTask).filter(ModelTask.id == task_id.id).first()
 
 
 def all(db: Session, limit: int, offset: int):
     """
-    tasks テーブルから条件を指定せずエントリを取得する。
+    条件を指定せずタスクを検索する。
     ID の小さいものから順に検索される。
 
     Parameters
@@ -45,14 +45,14 @@ def all(db: Session, limit: int, offset: int):
     Returns
     -------
     List[ModelTask]
-        検索されたエントリ。
+        検索されたタスクのリスト。
     """
     return db.query(ModelTask).order_by(ModelTask.id).limit(limit).offset(offset).all()
 
 
 def create(db: Session, task: TaskCreate):
     """
-    tasks テーブルに１件エントリを生成する。
+    タスクを１件生成する。
 
     Parameters
     ----------
@@ -82,7 +82,7 @@ def create(db: Session, task: TaskCreate):
 
 def update(db: Session, task: TaskUpdate):
     """
-    tasks テーブルのエントリを１件更新する。
+    タスクを１件更新する。
 
     Parameters
     ----------
@@ -106,7 +106,7 @@ def update(db: Session, task: TaskUpdate):
 
 def filterd_by_status(db: Session, statuses: List[TaskStatus], limit: int, offset: int):
     """
-    tasks テーブルのエントリのうち、指定されたステータスであるものを検索する。
+    指定されたステータスであるタスクを検索する。
     1. ステータスが進んでいるもの（（進んでいる）完了 > 作業中 > 未着手（進んでいない））
     2. 優先度が大きいもの
     3. ID が小さいもの
@@ -126,7 +126,7 @@ def filterd_by_status(db: Session, statuses: List[TaskStatus], limit: int, offse
     Returns
     -------
     List[ModelTask]
-        検索されたエントリ。
+        検索されたタスクのリスト。
     """
     return (
         db.query(ModelTask)
@@ -140,7 +140,7 @@ def filterd_by_status(db: Session, statuses: List[TaskStatus], limit: int, offse
 
 def not_assigned(db: Session, statuses: List[TaskStatus], limit: int, offset: int):
     """
-    tasks テーブルのエントリのうち、ユーザーに全くアサインされていないものを検索する。
+    ユーザーに全くアサインされていないタスクを検索する。
     1. 優先度が大きいもの
     2. ID が小さいもの
     の順に検索される。
@@ -159,7 +159,7 @@ def not_assigned(db: Session, statuses: List[TaskStatus], limit: int, offset: in
     Returns
     -------
     List[ModelTask]
-        検索されたエントリ。
+        検索されたタスクのリスト。
     """
     subquery = (
         ~db.query(ModelAssignment.task_id)
@@ -181,8 +181,7 @@ def with_user_filtered_by_statuses(
     db: Session, user_id: UserId, statuses: List[TaskStatus], limit: int, offset: int
 ):
     """
-    tasks テーブルのエントリのうち、指定したユーザーにアサインされている、
-    指定されたステータスであるものを検索する。
+    指定したユーザーにアサインされている、指定されたステータスであるタスクを検索する。
     1. ステータスが進んでいるもの（（進んでいる）完了 > 作業中 > 未着手（進んでいない））
     2. 優先度が大きいもの
     3. ID が小さいもの
@@ -204,7 +203,7 @@ def with_user_filtered_by_statuses(
     Returns
     -------
     List[ModelTask]
-        検索されたエントリ。
+        検索されたタスクのリスト。
     """
     return (
         db.query(ModelTask)

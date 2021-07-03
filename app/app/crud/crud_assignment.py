@@ -8,7 +8,7 @@ from app.schemas.user import UserId
 
 def find(db: Session, user_id: UserId, task_id: TaskId):
     """
-    assignments テーブルから１件エントリを取得する。
+    id で検索してアサインを１件取得する。
 
     Parameters
     ----------
@@ -22,7 +22,7 @@ def find(db: Session, user_id: UserId, task_id: TaskId):
     Returns
     -------
     ModelAssignment | None
-        検索されたエントリ。
+        検索されたアサイン。
     """
     return (
         db.query(ModelAssignment)
@@ -34,7 +34,7 @@ def find(db: Session, user_id: UserId, task_id: TaskId):
 
 def create(db: Session, assignment: AssignmentCreate):
     """
-    assignments テーブルに１件エントリを生成する。
+    アサインを１件生成する。
 
     Parameters
     ----------
@@ -50,7 +50,9 @@ def create(db: Session, assignment: AssignmentCreate):
         生成されたエントリ。
         SERIAL によって採番された id の情報を含む。
     """
-    db_assignment = ModelAssignment(user_id=assignment.user_id, task_id=assignment.task_id)
+    db_assignment = ModelAssignment(
+        user_id=assignment.user_id, task_id=assignment.task_id
+    )
     db.add(db_assignment)
     db.commit()
     db.refresh(db_assignment)
