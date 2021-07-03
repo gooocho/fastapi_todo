@@ -4,16 +4,15 @@ from app.crud import crud_task
 from app.schemas.task import TaskCreate, TaskId, TaskPriority, TaskStatus, TaskUpdate
 from app.schemas.user import UserId
 
+
 class TestTasks:
     def test_task_find(self, test_db: Session) -> None:
         task1 = crud_task.find(db=test_db, task_id=TaskId(id=1))
         assert task1.id == 1
 
-
     def test_task_all(self, test_db: Session) -> None:
         tasks = crud_task.all(db=test_db, limit=100, offset=0)
         assert len(tasks) == 6
-
 
     def test_task_create(self, test_db: Session) -> None:
         task_count = list(test_db.execute("SELECT COUNT(*) FROM tasks;"))[0][0]
@@ -35,7 +34,6 @@ class TestTasks:
         assert task_model.priority == priority
         assert task_model.status == status
 
-
     def test_task_update(self, test_db: Session) -> None:
         title = "task7 title updated"
         description = "task7 description updated"
@@ -50,7 +48,6 @@ class TestTasks:
         assert task_model.priority == priority
         assert task_model.status == status
 
-
     def test_task_filterd_by_status(self, test_db: Session) -> None:
         tasks = crud_task.filterd_by_status(
             test_db,
@@ -60,16 +57,18 @@ class TestTasks:
         )
         assert len(tasks) == 6
 
-
     def test_task_not_assigned(self, test_db: Session) -> None:
         tasks = crud_task.not_assigned(
             test_db, statuses=[TaskStatus.NEW], limit=100, offset=0
         )
         assert len(tasks) == 0
 
-
-    def test_task_not_resolved(self, test_db: Session) -> None:
-        tasks = crud_task.not_resolved(
-            test_db, user_id=UserId(id=1), statuses=[TaskStatus.NEW], limit=100, offset=0
+    def test_task_with_user_filtered_by_statuses(self, test_db: Session) -> None:
+        tasks = crud_task.with_user_filtered_by_statuses(
+            test_db,
+            user_id=UserId(id=1),
+            statuses=[TaskStatus.NEW],
+            limit=100,
+            offset=0,
         )
         assert len(tasks) == 0

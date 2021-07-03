@@ -67,7 +67,7 @@ def not_assigned(db: Session, statuses: List[TaskStatus], limit: int, offset: in
     )
 
 
-def not_resolved(
+def with_user_filtered_by_statuses(
     db: Session, user_id: UserId, statuses: List[TaskStatus], limit: int, offset: int
 ):
     return (

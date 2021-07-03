@@ -97,7 +97,7 @@ async def not_resolved_tasks(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
-    return crud_task.not_resolved(
+    return crud_task.with_user_filtered_by_statuses(
         db=db,
         user_id=UserId(id=user_id),
         statuses=NOT_RESOLVED,
