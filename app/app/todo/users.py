@@ -56,7 +56,7 @@ async def update_user(user: UserUpdate, db: Session = Depends(db_session)):
     """
     ユーザーを更新する
     """
-    model_user = crud_user.find_by_id(db=db, user_id=UserId(id=user.id))
+    model_user = crud_user.find(db=db, user_id=UserId(id=user.id))
     if model_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"

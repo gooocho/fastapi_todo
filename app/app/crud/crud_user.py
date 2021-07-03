@@ -8,10 +8,6 @@ def find(db: Session, user_id: UserId):
     return db.query(ModelUser).filter(ModelUser.id == user_id.id).first()
 
 
-def find_by_id(db: Session, user_id: UserId):
-    return db.query(ModelUser).filter(ModelUser.id == user_id.id).order_by(ModelUser.id).first()
-
-
 def find_by_mail(db: Session, mail: str):
     return db.query(ModelUser).filter(ModelUser.mail == mail).first()
 

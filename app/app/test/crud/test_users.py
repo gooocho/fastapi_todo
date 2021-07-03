@@ -9,10 +9,6 @@ class TestUsers:
         user1 = crud_user.find(db=test_db, user_id=UserId(id=1))
         assert user1.id == 1
 
-    def test_user_find_by_id(self, test_db: Session) -> None:
-        user1 = crud_user.find_by_id(db=test_db, user_id=UserId(id=1))
-        assert user1.id == 1
-
     def find_by_mail(self, test_db: Session) -> None:
         user1 = crud_user.find_by_mail(db=test_db, mail="user1@example.com")
         assert user1.id == 1
