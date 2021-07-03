@@ -24,6 +24,11 @@ def assigned_task_counts(db: Session, user_ids: List[UserId], status: TaskStatus
         検索対象にするユーザー群。
     status : TaskStatus
         検索するステータス。
+
+    returns
+    -------
+    any
+        （ユーザーID, アサインされているタスクの優先度, その優先度のタスクの数）のリスト。
     """
     return (
         db.query(
@@ -61,7 +66,7 @@ def status_task_counts(db: Session, status: TaskStatus, limit: int, offset: int)
     returns
     -------
     any
-        「ユーザーIDと、アサインされたタスクの数の組」のリスト。
+        （ユーザーID, アサインされたタスクの数）のリスト。
     """
     subquery = (
         db.query(ModelAssignment.user_id, func.count(ModelTask.id).label("task_count"))
