@@ -12,8 +12,10 @@ Base = declarative_base()
 
 
 def db_session():
+    session_local = SessionLocal()
     try:
-        session_local = SessionLocal()
         yield session_local
+    except:
+        session_local.rollback()
     finally:
         session_local.close()
