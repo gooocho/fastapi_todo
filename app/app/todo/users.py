@@ -16,7 +16,7 @@ users = APIRouter(prefix="/users")
 @users.get("/list", response_model=List[User], tags=["users"])
 async def list_users(pager: Pager = Depends(), db: Session = Depends(db_session)):
     """
-    ユーザーをすべて取得する
+    条件を指定せずユーザーを取得する。
     """
     model_users = crud_user.all(db=db, limit=pager.per_page, offset=pager.offset())
     return model_users
@@ -25,7 +25,7 @@ async def list_users(pager: Pager = Depends(), db: Session = Depends(db_session)
 @users.get("/get/{user_id}", response_model=User, tags=["users"])
 async def get_user(user_id: int, db=Depends(db_session)):
     """
-    IDを指定してユーザーを1つ取得する
+    IDを指定してユーザーを１件取得する。
     """
     model_user = crud_user.find(db=db, user_id=UserId(id=user_id))
     if model_user is None:
@@ -40,7 +40,7 @@ async def get_user(user_id: int, db=Depends(db_session)):
 )
 async def create_user(user: UserCreate, db: Session = Depends(db_session)):
     """
-    ユーザーを登録する
+    ユーザーを１件登録する。
     """
     model_user = crud_user.find_by_mail(db=db, mail=user.mail)
     if model_user:
@@ -54,7 +54,7 @@ async def create_user(user: UserCreate, db: Session = Depends(db_session)):
 @users.put("/update", response_model=User, tags=["users"])
 async def update_user(user: UserUpdate, db: Session = Depends(db_session)):
     """
-    ユーザーを更新する
+    ユーザーを１件更新する。
     """
     model_user = crud_user.find(db=db, user_id=UserId(id=user.id))
     if model_user is None:
@@ -72,7 +72,7 @@ async def update_user(user: UserUpdate, db: Session = Depends(db_session)):
 )
 async def delete_user(user_id: int, db=Depends(db_session)):
     """
-    ユーザーを削除する
+    ユーザーを１件削除する。
     """
     model_user = crud_user.find(db=db, user_id=UserId(id=user_id))
     if model_user is None:
@@ -89,8 +89,12 @@ async def not_resolved_tasks(
     db=Depends(db_session),
 ):
     """
-    ユーザーが担当している未完了のタスクを取得する
-    ステータス(IN_PROGRESS -> NEW), 優先度(高->低), ID(低->高)の順で出力される
+    ユーザーが担当している未完了のタスクを取得する。
+
+    1. ステータスが進んでいるもの（（進んでいる）完了 > 作業中 > 未着手（進んでいない））
+    2. 優先度が大きいもの
+    3. ID が小さいもの
+    の順で出力される。
     """
     model_user = crud_user.find(db=db, user_id=UserId(id=user_id))
     if model_user is None:

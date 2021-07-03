@@ -22,7 +22,7 @@ async def create_assignment(
     db: Session = Depends(db_session),
 ):
     """
-    ユーザーとタスクを紐づける
+    ユーザーをタスクにアサインする。
     """
     user_id = UserId(id=assignment.user_id)
     task_id = TaskId(id=assignment.task_id)

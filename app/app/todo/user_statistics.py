@@ -24,8 +24,8 @@ async def assigned_task_counts(
     pager: Pager = Depends(), db: Session = Depends(db_session)
 ):
     """
-    ユーザーにアサインされている作業中のタスクの数を優先度別に集計する
-    １つも作業中のタスクを持たないユーザーも出現する
+    ユーザーにアサインされている作業中のタスクの数を優先度別に集計する。
+    １つも作業中のタスクを持たないユーザーも出現する。
     """
     user_ids: List[UserId] = crud_user.all_id(
         db=db, limit=pager.per_page, offset=pager.offset()
@@ -66,9 +66,11 @@ async def resolved_task_counts(
     pager: Pager = Depends(), db: Session = Depends(db_session)
 ):
     """
-    ユーザーが完了させたタスクの数を集計する
-    完了させたタスクの数(多->少), ID(低->高)の順で出力される
-    １つもタスクを完了させていないユーザーも出現する
+    ユーザーが完了させたタスクの数を集計する。
+    1. 完了させたタスクの数が多いもの
+    2. ID が小さいもの
+    の順で出力される。
+    １つもタスクを完了させていないユーザーも出現する。
     """
     model_status_task_counts = crud_user_statistics.status_task_counts(
         db=db,

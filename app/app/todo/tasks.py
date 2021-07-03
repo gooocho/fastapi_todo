@@ -15,7 +15,7 @@ tasks = APIRouter(prefix="/tasks")
 @tasks.get("/list", response_model=List[Task], tags=["tasks"])
 async def list_tasks(pager: Pager = Depends(), db: Session = Depends(db_session)):
     """
-    タスクをすべて取得する
+    条件を指定せずタスクを取得する。
     """
     return crud_task.all(db=db, limit=pager.per_page, offset=pager.offset())
 
@@ -23,7 +23,7 @@ async def list_tasks(pager: Pager = Depends(), db: Session = Depends(db_session)
 @tasks.get("/get/{task_id}", response_model=Task, tags=["tasks"])
 async def get_task(task_id: int, db=Depends(db_session)):
     """
-    IDを指定してタスクを1つ取得する
+    IDを指定してタスクを１件取得する。
     """
     model_task = crud_task.find(db=db, task_id=TaskId(id=task_id))
     if model_task is None:
@@ -38,7 +38,7 @@ async def get_task(task_id: int, db=Depends(db_session)):
 )
 async def create_task(task: TaskCreate, db: Session = Depends(db_session)):
     """
-    タスクを登録する
+    タスクを１件登録する。
     """
     return crud_task.create(db=db, task=task)
 
@@ -46,7 +46,7 @@ async def create_task(task: TaskCreate, db: Session = Depends(db_session)):
 @tasks.put("/update", response_model=Task, tags=["tasks"])
 async def update_task(task: TaskUpdate, db: Session = Depends(db_session)):
     """
-    タスクを更新する
+    タスクを１件更新する。
     """
     model_task = crud_task.find(db=db, task_id=TaskId(id=task.id))
     if model_task is None:
@@ -61,8 +61,12 @@ async def not_resolved_tasks(
     pager: Pager = Depends(), db: Session = Depends(db_session)
 ):
     """
-    未完了のタスク(NEW / IN_PROGRESS)を取得する
-    ステータス(IN_PROGRESS -> NEW), 優先度(高->低), ID(低->高)の順で出力される
+    未完了(NEW / IN_PROGRESS)のタスクを取得する。
+
+    1. ステータスが進んでいるもの（（進んでいる）作業中 > 未着手（進んでいない））
+    2. 優先度が大きいもの
+    3. ID が小さいもの
+    の順で出力される。
     """
     return crud_task.filterd_by_status(
         db=db, statuses=NOT_RESOLVED, limit=pager.per_page, offset=pager.offset()
@@ -74,8 +78,10 @@ async def not_assigned_tasks(
     pager: Pager = Depends(), db: Session = Depends(db_session)
 ):
     """
-    誰にもアサインされていない未完了のタスクを取得する
-    優先度(高->低), ID(低->高)の順で出力される
+    どのユーザーにもアサインされていない、未完了(NEW / IN_PROGRESS)のタスクを取得する。
+    1. 優先度が大きいもの
+    2. ID が小さいもの
+    の順で出力される。
     """
     return crud_task.not_assigned(
         db=db, statuses=NOT_RESOLVED, limit=pager.per_page, offset=pager.offset()
