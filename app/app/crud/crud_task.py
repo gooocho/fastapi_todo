@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.assignment import ModelAssignment
 from app.models.task import ModelTask
-from app.schemas.task import TaskCreate, TaskId, TaskUpdate
+from app.schemas.task import TaskCreate, TaskId, TaskStatus, TaskUpdate
 from app.schemas.user import UserId
 
 
@@ -39,7 +39,7 @@ def update(db: Session, task: TaskUpdate):
     return db_task.first()
 
 
-def filterd_by_status(db: Session, statuses: List[int], limit: int, offset: int):
+def filterd_by_status(db: Session, statuses: List[TaskStatus], limit: int, offset: int):
     return (
         db.query(ModelTask)
         .filter(ModelTask.status.in_(statuses))
@@ -50,7 +50,7 @@ def filterd_by_status(db: Session, statuses: List[int], limit: int, offset: int)
     )
 
 
-def not_assigned(db: Session, statuses: List[int], limit: int, offset: int):
+def not_assigned(db: Session, statuses: List[TaskStatus], limit: int, offset: int):
     subquery = (
         ~db.query(ModelAssignment.task_id)
         .filter(ModelAssignment.task_id == ModelTask.id)
@@ -68,7 +68,7 @@ def not_assigned(db: Session, statuses: List[int], limit: int, offset: int):
 
 
 def not_resolved(
-    db: Session, user_id: UserId, statuses: List[int], limit: int, offset: int
+    db: Session, user_id: UserId, statuses: List[TaskStatus], limit: int, offset: int
 ):
     return (
         db.query(ModelTask)
