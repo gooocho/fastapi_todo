@@ -3,22 +3,22 @@ from typing import List
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
-from app.models.assignment import Assignment
-from app.models.task import Task
+from app.models.assignment import ModelAssignment
+from app.models.task import ModelTask
 from app.schemas.task import TaskCreate, TaskId, TaskUpdate
 from app.schemas.user import UserId
 
 
 def find(db: Session, task_id: TaskId):
-    return db.query(Task).filter(Task.id == task_id.id).first()
+    return db.query(ModelTask).filter(ModelTask.id == task_id.id).first()
 
 
 def all(db: Session, limit: int, offset: int):
-    return db.query(Task).limit(limit).offset(offset).all()
+    return db.query(ModelTask).limit(limit).offset(offset).all()
 
 
 def create(db: Session, task: TaskCreate):
-    db_task = Task(
+    db_task = ModelTask(
         title=task.title,
         description=task.description,
         priority=task.priority,
@@ -31,7 +31,7 @@ def create(db: Session, task: TaskCreate):
 
 
 def update(db: Session, task: TaskUpdate):
-    db_task = db.query(Task).filter(Task.id == task.id)
+    db_task = db.query(ModelTask).filter(ModelTask.id == task.id)
     compacted = {k: v for (k, v) in task.dict().items() if v is not None and k != "id"}
     if len(compacted):
         db_task.update(compacted)
@@ -41,9 +41,9 @@ def update(db: Session, task: TaskUpdate):
 
 def filterd_by_status(db: Session, statuses: List[int], limit: int, offset: int):
     return (
-        db.query(Task)
-        .filter(Task.status.in_(statuses))
-        .order_by(desc(Task.status), desc(Task.priority), Task.id)
+        db.query(ModelTask)
+        .filter(ModelTask.status.in_(statuses))
+        .order_by(desc(ModelTask.status), desc(ModelTask.priority), ModelTask.id)
         .limit(limit)
         .offset(offset)
         .all()
@@ -52,13 +52,13 @@ def filterd_by_status(db: Session, statuses: List[int], limit: int, offset: int)
 
 def not_assigned(db: Session, statuses: List[int], limit: int, offset: int):
     subquery = (
-        ~db.query(Assignment.task_id).filter(Assignment.task_id == Task.id).exists()
+        ~db.query(ModelAssignment.task_id).filter(ModelAssignment.task_id == ModelTask.id).exists()
     )
     return (
-        db.query(Task)
-        .filter(Task.status.in_(statuses))
+        db.query(ModelTask)
+        .filter(ModelTask.status.in_(statuses))
         .filter(subquery)
-        .order_by(desc(Task.priority), Task.id)
+        .order_by(desc(ModelTask.priority), ModelTask.id)
         .limit(limit)
         .offset(offset)
         .all()
@@ -69,11 +69,11 @@ def not_resolved(
     db: Session, user_id: UserId, statuses: List[int], limit: int, offset: int
 ):
     return (
-        db.query(Task)
-        .join(Assignment)
-        .filter(Task.status.in_(statuses))
-        .filter(Assignment.user_id == user_id.id)
-        .order_by(desc(Task.status), desc(Task.priority), Task.id)
+        db.query(ModelTask)
+        .join(ModelAssignment)
+        .filter(ModelTask.status.in_(statuses))
+        .filter(ModelAssignment.user_id == user_id.id)
+        .order_by(desc(ModelTask.status), desc(ModelTask.priority), ModelTask.id)
         .limit(limit)
         .offset(offset)
         .all()

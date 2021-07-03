@@ -31,21 +31,26 @@ async def assigned_task_counts(
         db=db, limit=pager.per_page, offset=pager.offset()
     )
 
-    assigned_task_counts = crud_user_statistics.assigned_task_counts(
+    model_assigned_task_counts = crud_user_statistics.assigned_task_counts(
         db=db, user_ids=user_ids, status=TaskStatus.IN_PROGRESS
     )
 
-    user_id_2_assigned_task_counts = {
+    user_id_2_model_assigned_task_counts = {
         user_id: list(row)
-        for user_id, row in groupby(assigned_task_counts, lambda row: row.user_id)
+        for user_id, row in groupby(model_assigned_task_counts, lambda row: row.user_id)
     }
 
     return [
         PriorityTaskCounts(
             user_id=user_id.id,
             priority_task_counts=[
-                PriorityTaskCount(priority=row.priority, task_count=row.task_count)
-                for row in user_id_2_assigned_task_counts.get(user_id.id, [])
+                PriorityTaskCount(
+                    priority=model_assigned_task_count.priority,
+                    task_count=model_assigned_task_count.task_count,
+                )
+                for model_assigned_task_count in user_id_2_model_assigned_task_counts.get(
+                    user_id.id, []
+                )
             ],
         )
         for user_id in user_ids
@@ -65,7 +70,16 @@ async def resolved_task_counts(
     完了させたタスクの数(多->少), ID(低->高)の順で出力される
     １つもタスクを完了させていないユーザーも出現する
     """
-    rows = crud_user_statistics.status_task_counts(
-        db=db, status=TaskStatus.RESOLVED, limit=pager.per_page, offset=pager.offset()
+    model_status_task_counts = crud_user_statistics.status_task_counts(
+        db=db,
+        status=TaskStatus.RESOLVED,
+        limit=pager.per_page,
+        offset=pager.offset(),
     )
-    return [TaskCount(user_id=row.id, task_count=row.task_count) for row in rows]
+    return [
+        TaskCount(
+            user_id=model_status_task_count.id,
+            task_count=model_status_task_count.task_count,
+        )
+        for model_status_task_count in model_status_task_counts
+    ]

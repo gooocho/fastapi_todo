@@ -25,12 +25,12 @@ async def get_task(task_id: int, db=Depends(db_session)):
     """
     IDを指定してタスクを1つ取得する
     """
-    db_task = crud_task.find(db=db, task_id=TaskId(id=task_id))
-    if db_task is None:
+    model_task = crud_task.find(db=db, task_id=TaskId(id=task_id))
+    if model_task is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
         )
-    return db_task
+    return model_task
 
 
 @tasks.post(
@@ -48,8 +48,8 @@ async def update_task(task: TaskUpdate, db: Session = Depends(db_session)):
     """
     タスクを更新する
     """
-    db_task = crud_task.find(db=db, task_id=TaskId(id=task.id))
-    if db_task is None:
+    model_task = crud_task.find(db=db, task_id=TaskId(id=task.id))
+    if model_task is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
         )

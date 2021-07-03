@@ -3,7 +3,7 @@ from sqlalchemy import Column, ForeignKey, Integer
 from app.db.settings import Base
 
 
-class Assignment(Base):
+class ModelAssignment(Base):
     __tablename__ = "assignments"
 
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)

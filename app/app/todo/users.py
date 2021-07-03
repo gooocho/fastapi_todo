@@ -18,8 +18,8 @@ async def list_users(pager: Pager = Depends(), db: Session = Depends(db_session)
     """
     ユーザーをすべて取得する
     """
-    users = crud_user.all(db=db, limit=pager.per_page, offset=pager.offset())
-    return users
+    model_users = crud_user.all(db=db, limit=pager.per_page, offset=pager.offset())
+    return model_users
 
 
 @users.get("/get/{user_id}", response_model=User, tags=["users"])
@@ -27,12 +27,12 @@ async def get_user(user_id: int, db=Depends(db_session)):
     """
     IDを指定してユーザーを1つ取得する
     """
-    db_user = crud_user.find(db=db, user_id=UserId(id=user_id))
-    if db_user is None:
+    model_user = crud_user.find(db=db, user_id=UserId(id=user_id))
+    if model_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
-    return db_user
+    return model_user
 
 
 @users.post(
@@ -42,8 +42,8 @@ async def create_user(user: UserCreate, db: Session = Depends(db_session)):
     """
     ユーザーを登録する
     """
-    db_user = crud_user.find_by_mail(db=db, mail=user.mail)
-    if db_user:
+    model_user = crud_user.find_by_mail(db=db, mail=user.mail)
+    if model_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email address is already in use",
@@ -56,8 +56,8 @@ async def update_user(user: UserUpdate, db: Session = Depends(db_session)):
     """
     ユーザーを更新する
     """
-    db_user = crud_user.find_by_id(db=db, user_id=UserId(id=user.id))
-    if db_user is None:
+    model_user = crud_user.find_by_id(db=db, user_id=UserId(id=user.id))
+    if model_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
@@ -74,8 +74,8 @@ async def delete_user(user_id: int, db=Depends(db_session)):
     """
     ユーザーを削除する
     """
-    db_user = crud_user.find(db=db, user_id=UserId(id=user_id))
-    if db_user is None:
+    model_user = crud_user.find(db=db, user_id=UserId(id=user_id))
+    if model_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
@@ -92,8 +92,8 @@ async def not_resolved_tasks(
     ユーザーが担当している未完了のタスクを取得する
     ステータス(IN_PROGRESS -> NEW), 優先度(高->低), ID(低->高)の順で出力される
     """
-    db_user = crud_user.find(db=db, user_id=UserId(id=user_id))
-    if db_user is None:
+    model_user = crud_user.find(db=db, user_id=UserId(id=user_id))
+    if model_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )

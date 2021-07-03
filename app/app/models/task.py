@@ -2,10 +2,10 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.db.settings import Base
-from app.models.assignment import Assignment
+from app.models.assignment import ModelAssignment
 
 
-class Task(Base):
+class ModelTask(Base):
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -15,8 +15,8 @@ class Task(Base):
     status = Column(Integer, index=True)
 
     users = relationship(
-        "User",
-        secondary=Assignment.__tablename__,
-        order_by="User.id",
+        "ModelUser",
+        secondary=ModelAssignment.__tablename__,
+        order_by="ModelUser.id",
         back_populates="tasks",
     )
