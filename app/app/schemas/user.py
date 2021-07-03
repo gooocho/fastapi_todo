@@ -16,7 +16,7 @@ class UserCreate(BaseUser):
     pass
 
 
-class UserUpdate(BaseUser):
+class UserUpdate(BaseModel):
     id: int
     name: Optional[str]
     mail: Optional[EmailStr]

@@ -51,7 +51,7 @@ class TaskCreate(TaskBase):
     status: Optional[TaskStatus] = Field(TaskStatus.NEW)
 
 
-class TaskUpdate(TaskBase):
+class TaskUpdate(BaseModel):
     id: int
     title: Optional[str]
     description: Optional[str]
