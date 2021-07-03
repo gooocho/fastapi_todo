@@ -18,7 +18,7 @@ def find(db: Session, task_id: TaskId):
     db : sqlalchemy.orm.Session
         接続するデータベース。
     task_id : TaskId
-        検索するID。
+        検索するタスクID。
 
     Returns
     -------
@@ -59,13 +59,13 @@ def create(db: Session, task: TaskCreate):
     db : sqlalchemy.orm.Session
         接続するデータベース。
     task : TaskCreate
-        生成する task。
+        生成するタスクの情報。
         id は SERIAL によって採番されるので、id の情報は含まない。
 
     Returns
     -------
     ModelTask
-        生成された Task。
+        生成されたエントリ。
         SERIAL によって採番された id の情報を含む。
     """
     db_task = ModelTask(
@@ -89,12 +89,12 @@ def update(db: Session, task: TaskUpdate):
     db : sqlalchemy.orm.Session
         接続するデータベース。
     task : TaskUpdate
-        更新する task。
+        更新するタスク。
 
     Returns
     -------
     ModelTask | None
-        更新された Task。
+        更新されたエントリ。
     """
     db_task = db.query(ModelTask).filter(ModelTask.id == task.id)
     compacted = {k: v for (k, v) in task.dict().items() if v is not None and k != "id"}
