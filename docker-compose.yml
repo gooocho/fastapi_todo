@@ -23,6 +23,8 @@ services:
     ports:
       - "0.0.0.0:8080:80"
     volumes:
-      - ./app:/app
+      - type: bind
+        source: "./app"
+        target: "/app"
     env_file:
       - .env
