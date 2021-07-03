@@ -17,17 +17,17 @@ def db() -> Generator:
 
 
 @pytest.fixture(scope="function")
-def client(sample_db) -> Generator:
-    def sample_db_gen():
-        yield sample_db
-    app.dependency_overrides[db_session] = sample_db_gen
+def client(test_db) -> Generator:
+    def test_db_session():
+        yield test_db
+    app.dependency_overrides[db_session] = test_db_session
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides[db_session] = db_session
 
 
 @pytest.fixture(scope="function")
-def sample_db() -> Generator:
+def test_db() -> Generator:
     db = SessionLocal()
 
     db.execute(f"TRUNCATE users CASCADE;")

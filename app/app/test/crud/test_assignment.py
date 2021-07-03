@@ -7,25 +7,25 @@ from app.schemas.user import UserId
 
 
 class TestAssignment:
-    def test_assignment_find(self, sample_db: Session) -> None:
+    def test_assignment_find(self, test_db: Session) -> None:
         assignment1 = crud_assignment.find(
-            db=sample_db, user_id=UserId(id=2), task_id=TaskId(id=1)
+            db=test_db, user_id=UserId(id=2), task_id=TaskId(id=1)
         )
         assert assignment1.user_id == 2
         assert assignment1.task_id == 1
 
-    def test_assignment_create(self, sample_db: Session) -> None:
-        assignments_count = list(
-            sample_db.execute("SELECT COUNT(*) FROM assignments;")
-        )[0][0]
+    def test_assignment_create(self, test_db: Session) -> None:
+        assignments_count = list(test_db.execute("SELECT COUNT(*) FROM assignments;"))[
+            0
+        ][0]
         user_id = 1
         task_id = 1
 
         assignment = AssignmentCreate(user_id=user_id, task_id=task_id)
-        assignment_model = crud_assignment.create(sample_db, assignment=assignment)
+        assignment_model = crud_assignment.create(test_db, assignment=assignment)
 
         assert (
-            list(sample_db.execute("SELECT COUNT(*) FROM assignments;"))[0][0]
+            list(test_db.execute("SELECT COUNT(*) FROM assignments;"))[0][0]
             == assignments_count + 1
         )
         assert assignment_model.user_id == user_id
