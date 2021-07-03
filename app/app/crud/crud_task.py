@@ -14,7 +14,7 @@ def find(db: Session, task_id: TaskId):
 
 
 def all(db: Session, limit: int, offset: int):
-    return db.query(ModelTask).limit(limit).offset(offset).all()
+    return db.query(ModelTask).order_by(ModelTask.id).limit(limit).offset(offset).all()
 
 
 def create(db: Session, task: TaskCreate):
@@ -52,7 +52,9 @@ def filterd_by_status(db: Session, statuses: List[int], limit: int, offset: int)
 
 def not_assigned(db: Session, statuses: List[int], limit: int, offset: int):
     subquery = (
-        ~db.query(ModelAssignment.task_id).filter(ModelAssignment.task_id == ModelTask.id).exists()
+        ~db.query(ModelAssignment.task_id)
+        .filter(ModelAssignment.task_id == ModelTask.id)
+        .exists()
     )
     return (
         db.query(ModelTask)
