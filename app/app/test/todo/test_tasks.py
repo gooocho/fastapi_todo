@@ -1,3 +1,5 @@
+import pytest
+
 from fastapi import status
 from fastapi.testclient import TestClient
 
@@ -5,59 +7,112 @@ from app.schemas.task import TaskPriority, TaskStatus
 
 
 class TestTasks:
-    def test_list_tasks(self, client: TestClient) -> None:
-        response = client.get("/tasks/list?page=1&per_page=2")
+    @pytest.mark.parametrize(
+        "page, per_page, expect",
+        [
+            (
+                1,
+                2,
+                [
+                    {
+                        "id": 1,
+                        "title": "1",
+                        "description": "",
+                        "priority": 1,
+                        "status": 1,
+                    },
+                    {
+                        "id": 2,
+                        "title": "2",
+                        "description": "",
+                        "priority": 1,
+                        "status": 1,
+                    },
+                ],
+            ),
+            (
+                2,
+                2,
+                [
+                    {
+                        "id": 3,
+                        "title": "3",
+                        "description": "",
+                        "priority": 2,
+                        "status": 1,
+                    },
+                    {
+                        "id": 4,
+                        "title": "4",
+                        "description": "",
+                        "priority": 2,
+                        "status": 1,
+                    },
+                ],
+            ),
+            (
+                1,
+                3,
+                [
+                    {
+                        "id": 1,
+                        "title": "1",
+                        "description": "",
+                        "priority": 1,
+                        "status": 1,
+                    },
+                    {
+                        "id": 2,
+                        "title": "2",
+                        "description": "",
+                        "priority": 1,
+                        "status": 1,
+                    },
+                    {
+                        "id": 3,
+                        "title": "3",
+                        "description": "",
+                        "priority": 2,
+                        "status": 1,
+                    },
+                ],
+            ),
+        ],
+    )
+    def test_list_tasks(self, page, per_page, expect, client: TestClient) -> None:
+        response = client.get(f"/tasks/list?page={page}&per_page={per_page}")
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == [
-            {
-                "title": "task1 title",
-                "id": 1,
-                "description": "task1 description",
-                "priority": 1,
-                "status": 1,
-            },
-            {
-                "title": "task2 title",
-                "id": 2,
-                "description": "task2 description",
-                "priority": 1,
-                "status": 1,
-            },
-        ]
+        assert response.json() == expect
 
     def test_get_task(self, client: TestClient) -> None:
         response = client.get("/tasks/get/1")
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
-            "title": "task1 title",
             "id": 1,
-            "description": "task1 description",
+            "title": "1",
+            "description": "",
             "priority": 1,
             "status": 1,
         }
 
     def test_create_task(self, client: TestClient) -> None:
-        task_counts = len(client.get("/tasks/list?page=1&per_page=10").json())
         response = client.post(
             "/tasks/create",
             json={
-                "title": "task7 title updated",
-                "description": "task7 description updated",
+                "title": "71",
+                "description": "",
                 "priority": TaskPriority.NORMAL,
                 "status": TaskStatus.NEW,
             },
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
-            "title": "task7 title updated",
-            "id": 7,
-            "description": "task7 description updated",
+            "id": 71,
+            "title": "71",
+            "description": "",
             "priority": 3,
             "status": 1,
         }
-        assert (
-            len(client.get("/tasks/list?page=1&per_page=10").json()) == task_counts + 1
-        )
 
     def test_update_task(self, client: TestClient) -> None:
         response = client.put(
@@ -83,30 +138,16 @@ class TestTasks:
         response = client.get("/tasks/not_resolved?page=1&per_page=3")
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [
-            {
-                "id": 1,
-                "title": "task1 title",
-                "description": "task1 description",
-                "priority": 1,
-                "status": 1,
-            },
-            {
-                "id": 2,
-                "title": "task2 title",
-                "description": "task2 description",
-                "priority": 1,
-                "status": 1,
-            },
-            {
-                "id": 3,
-                "title": "task3 title",
-                "description": "task3 description",
-                "priority": 1,
-                "status": 1,
-            },
+            {"title": "35", "id": 35, "description": "", "priority": 5, "status": 2},
+            {"title": "36", "id": 36, "description": "", "priority": 5, "status": 2},
+            {"title": "37", "id": 37, "description": "", "priority": 5, "status": 2},
         ]
 
     def test_not_assigned_tasks(self, client: TestClient) -> None:
         response = client.get("/tasks/not_assigned?page=1&per_page=3")
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == []
+        assert response.json() == [
+            {"id": 61, "title": "61", "description": "", "priority": 1, "status": 1},
+            {"id": 62, "title": "62", "description": "", "priority": 1, "status": 1},
+            {"id": 63, "title": "63", "description": "", "priority": 1, "status": 1},
+        ]
